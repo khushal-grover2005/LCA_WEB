@@ -11,6 +11,7 @@ import {
   Sparkles,
   TrendingDown,
 } from "lucide-react"
+import { GlowingCard } from "@/components/ui/glowing-card"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -98,14 +99,10 @@ export function Features() {
           {FEATURES.map((f) => {
             const Icon = f.icon
             return (
-              <div
+              <GlowingCard
                 key={f.title}
-                className="feature-card group relative overflow-hidden rounded-xl border border-border bg-card/60 p-6 backdrop-blur-sm transition-colors hover:border-primary/40"
+                className="feature-card"
               >
-                <div
-                  aria-hidden
-                  className="absolute inset-0 -z-10 bg-gradient-to-br from-primary/0 via-transparent to-accent/0 opacity-0 transition-opacity group-hover:opacity-100"
-                />
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
                   <Icon className="h-5 w-5" />
                 </div>
@@ -115,7 +112,7 @@ export function Features() {
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                   {f.body}
                 </p>
-              </div>
+              </GlowingCard>
             )
           })}
         </div>
