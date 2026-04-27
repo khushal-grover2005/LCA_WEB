@@ -71,6 +71,15 @@ export function PredictionsList({
   if (rows.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-border bg-card/50 p-12 text-center">
+        <style dangerouslySetInnerHTML={{ __html: `
+          @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(234, 120, 52, 0.4); }
+            50% { box-shadow: 0 0 10px 2px rgba(234, 120, 52, 0.6); }
+          }
+          .animate-button-ready {
+            animation: pulse-glow 2s infinite;
+          }
+        ` }} />
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
           <Sparkles className="h-5 w-5" />
         </div>
@@ -80,7 +89,7 @@ export function PredictionsList({
         <p className="mt-2 text-sm text-muted-foreground">
           Run your first prediction and save it here for easy comparison.
         </p>
-        <Button asChild className="mt-6">
+        <Button asChild className="mt-6 animate-button-ready">
           <Link href="/predictor">Run a prediction</Link>
         </Button>
       </div>
@@ -88,8 +97,20 @@ export function PredictionsList({
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-border bg-card">
-      <div className="hidden grid-cols-[1.2fr_1.5fr_0.8fr_0.8fr_0.8fr_0.6fr_auto] gap-4 border-b border-border bg-muted/30 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground md:grid">
+    <div className="overflow-hidden rounded-xl border border-border bg-card shadow-lg shadow-black/5">
+      {/* Terminal Header */}
+      <div className="flex items-center gap-2 border-b border-border bg-muted/20 px-5 py-3">
+        <div className="flex gap-1.5">
+          <div className="h-2.5 w-2.5 rounded-full bg-destructive/60" />
+          <div className="h-2.5 w-2.5 rounded-full bg-amber-500/60" />
+          <div className="h-2.5 w-2.5 rounded-full bg-emerald-500/60" />
+        </div>
+        <div className="ml-2 text-xs font-mono text-muted-foreground">
+          PREDICTION_LOG_TERMINAL_V1
+        </div>
+      </div>
+
+      <div className="hidden grid-cols-[1.2fr_1.5fr_0.8fr_0.8fr_0.8fr_0.6fr_auto] gap-4 border-b border-border bg-muted/10 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground md:grid">
         <div>Metal</div>
         <div>Route</div>
         <div className="text-right">GWP</div>
@@ -98,23 +119,23 @@ export function PredictionsList({
         <div>Imputed</div>
         <div className="text-right">Date</div>
       </div>
-      <ul className="divide-y divide-border">
+      <ul className="divide-y divide-border/50">
         {rows.map((row) => {
           const imputedCount = row.imputed_fields?.length ?? 0
           return (
             <li
               key={row.id}
-              className="group grid grid-cols-1 gap-3 px-5 py-4 transition-colors hover:bg-muted/30 md:grid-cols-[1.2fr_1.5fr_0.8fr_0.8fr_0.8fr_0.6fr_auto] md:items-center md:gap-4"
+              className="group grid grid-cols-1 gap-3 px-5 py-4 transition-all duration-300 hover:bg-primary/5 hover:backdrop-blur-sm md:grid-cols-[1.2fr_1.5fr_0.8fr_0.8fr_0.8fr_0.6fr_auto] md:items-center md:gap-4"
             >
               <div>
-                <div className="font-serif text-lg font-semibold">
+                <div className="font-serif text-lg font-semibold group-hover:text-primary transition-colors">
                   {row.metal}
                 </div>
-                <div className="text-xs text-muted-foreground md:hidden">
+                <div className="text-xs text-muted-foreground md:hidden font-mono">
                   {row.production_route}
                 </div>
               </div>
-              <div className="hidden text-sm text-muted-foreground md:block">
+              <div className="hidden text-sm text-muted-foreground md:block font-mono">
                 {row.production_route}
               </div>
               <div className="flex items-center gap-4 md:contents">
@@ -129,38 +150,38 @@ export function PredictionsList({
                 </div>
                 <div className="flex items-center gap-1.5 md:block md:text-right">
                   <Recycle className="h-3.5 w-3.5 text-accent md:hidden" />
-                  <span className="font-mono text-sm tabular-nums">
+                  <span className="font-mono text-sm tabular-nums text-accent font-semibold">
                     {formatNum(row.circularity_index, 2)}
                   </span>
                 </div>
                 <div className="md:text-right">
                   <span className="font-mono text-sm tabular-nums">
-                    {formatNum(row.recycled_content_est, 1)}
+                    {formatNum(row.recycled_content_est, 1)}%
                   </span>
                 </div>
               </div>
               <div>
                 {imputedCount > 0 ? (
-                  <Badge variant="outline" className="text-[10px]">
-                    {imputedCount} est.
+                  <Badge variant="outline" className="border-accent/30 bg-accent/5 text-[10px] text-accent">
+                    {imputedCount} EST
                   </Badge>
                 ) : (
-                  <span className="text-xs text-muted-foreground">—</span>
+                  <span className="text-xs text-muted-foreground font-mono">—</span>
                 )}
               </div>
               <div className="flex items-center justify-between gap-2 md:justify-end">
-                <span className="text-xs text-muted-foreground">
+                <span className="text-xs text-muted-foreground font-mono">
                   {formatDate(row.created_at)}
                 </span>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-7 w-7 opacity-60 hover:opacity-100"
+                  className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
                   onClick={() => onDelete(row.id)}
                   disabled={deletingId === row.id}
                   aria-label="Delete prediction"
                 >
-                  <Trash2 className="h-3.5 w-3.5" />
+                  <Trash2 className="h-3.5 w-3.5 text-destructive" />
                 </Button>
               </div>
             </li>
@@ -170,3 +191,4 @@ export function PredictionsList({
     </div>
   )
 }
+

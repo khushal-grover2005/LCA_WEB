@@ -174,8 +174,10 @@ export function PredictorForm({ authenticated }: { authenticated: boolean }) {
         {/* Submit bar */}
         <div
           className={cn(
-            "predictor-enter sticky bottom-4 z-10 flex flex-wrap items-center justify-between gap-4 rounded-xl border bg-card/95 p-4 shadow-xl backdrop-blur",
-            isValid ? "border-primary/40 shadow-primary/10" : "border-border",
+            "predictor-enter sticky bottom-4 z-10 flex flex-wrap items-center justify-between gap-4 rounded-xl border bg-card/95 p-4 shadow-xl backdrop-blur transition-all duration-500",
+            isValid
+              ? "border-primary/40 shadow-primary/10 animate-button-ready"
+              : "border-border shadow-none",
           )}
         >
           <div className="flex items-center gap-3 text-sm">
@@ -183,29 +185,18 @@ export function PredictorForm({ authenticated }: { authenticated: boolean }) {
               <>
                 <Sparkles className="h-4 w-4 text-primary" />
                 <span className="text-foreground">
-                  Ready to predict with{" "}
-                  <span className="font-medium text-primary">
-                    {Object.keys(payload).length}
-                  </span>{" "}
-                  parameters
-                </span>
-              </>
-            ) : errorCount > 0 ? (
-              <>
-                <AlertCircle className="h-4 w-4 text-destructive" />
-                <span className="text-muted-foreground">
-                  Fix{" "}
-                  <span className="font-medium text-destructive">
-                    {errorCount}
-                  </span>{" "}
-                  invalid field
-                  {errorCount > 1 ? "s" : ""} to continue
+                  System Status: <span className="font-semibold text-primary">READY</span>
                 </span>
               </>
             ) : (
-              <span className="text-muted-foreground">
-                Select a metal and a production route to enable prediction.
-              </span>
+              <>
+                <AlertCircle className={cn("h-4 w-4", errorCount > 0 ? "text-destructive" : "text-muted-foreground")} />
+                <span className="text-muted-foreground">
+                  {errorCount > 0
+                    ? `Input Error: ${errorCount} field(s) require attention.`
+                    : "System Status: Awaiting valid identity inputs."}
+                </span>
+              </>
             )}
           </div>
           <div className="flex items-center gap-2">
@@ -227,8 +218,10 @@ export function PredictorForm({ authenticated }: { authenticated: boolean }) {
               size="lg"
               disabled={!isValid || loading}
               className={cn(
-                "transition-all",
-                !isValid && "opacity-50",
+                "transition-all duration-300 font-semibold uppercase tracking-wider",
+                isValid
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                  : "bg-muted text-muted-foreground cursor-not-allowed opacity-50 grayscale",
               )}
             >
               {loading ? (
@@ -239,7 +232,7 @@ export function PredictorForm({ authenticated }: { authenticated: boolean }) {
               ) : (
                 <>
                   <Sparkles className="mr-2 h-4 w-4" />
-                  Run prediction
+                  Initiate Analysis
                 </>
               )}
             </Button>
@@ -268,3 +261,4 @@ export function PredictorForm({ authenticated }: { authenticated: boolean }) {
     </div>
   )
 }
+

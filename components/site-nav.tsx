@@ -12,6 +12,8 @@ const LINKS = [
   { href: "/", label: "Home" },
   { href: "/predictor", label: "Predictor" },
   { href: "/dashboard", label: "Dashboard" },
+  { href: "/insights", label: "Insights" },
+  { href: "/chat", label: "Chat" },
 ]
 
 export function SiteNav() {
@@ -117,3 +119,4 @@ export function SiteNav() {
     </header>
   )
 }
+

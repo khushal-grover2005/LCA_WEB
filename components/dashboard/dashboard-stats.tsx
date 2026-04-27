@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react"
 import gsap from "gsap"
 import { BarChart3, Flame, Recycle, Sparkles } from "lucide-react"
+import { GlowingCard } from "@/components/ui/glowing-card"
 
 type Row = {
   gwp_total: number | null
@@ -81,10 +82,7 @@ export function DashboardStats({ rows }: { rows: Row[] }) {
       {stats.map((s) => {
         const Icon = s.icon
         return (
-          <div
-            key={s.label}
-            className="stat-card rounded-xl border border-border bg-card p-5"
-          >
+          <GlowingCard key={s.label} className="stat-card">
             <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground">
               <Icon
                 className={`h-3.5 w-3.5 ${
@@ -103,9 +101,10 @@ export function DashboardStats({ rows }: { rows: Row[] }) {
             {s.hint && (
               <div className="text-[10px] text-muted-foreground">{s.hint}</div>
             )}
-          </div>
+          </GlowingCard>
         )
       })}
     </div>
   )
 }
+
