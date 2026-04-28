@@ -28,6 +28,10 @@ export function LoginForm() {
         provider: "google",
         options: {
           redirectTo: `${window.location.origin}/auth/callback?next=${redirect}`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent select_account',
+          },
         },
       })
       if (error) throw error

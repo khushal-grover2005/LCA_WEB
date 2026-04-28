@@ -1,6 +1,8 @@
 {
+  "/api/predict/route": "app/api/predict/route.js",
   "/auth/callback/route": "app/auth/callback/route.js",
   "/auth/login/page": "app/auth/login/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
   "/insights/page": "app/insights/page.js",
   "/page": "app/page.js",
   "/predictor/page": "app/predictor/page.js"
