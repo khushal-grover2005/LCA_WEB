@@ -28,7 +28,7 @@ export function CTA() {
   }, [])
 
   return (
-    <section ref={ref} className="py-20 md:py-28">
+    <section ref={ref} className="pt-0 pb-20 md:pb-28">
       <div className="mx-auto max-w-7xl px-6">
         <div className="relative overflow-hidden rounded-2xl border border-border bg-card/80 p-10 md:p-16">
           <div
@@ -42,7 +42,7 @@ export function CTA() {
               sizes="100vw"
               className="object-cover opacity-30"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-card via-card/80 to-card/40" />
+            <div className="absolute inset-0 bg-linear-to-r from-card via-card/80 to-card/40" />
           </div>
 
           <div className="cta-content max-w-2xl">
@@ -71,3 +71,4 @@ export function CTA() {
     </section>
   )
 }
+

@@ -79,7 +79,7 @@ export function Features() {
   }, [])
 
   return (
-    <section ref={ref} className="relative py-20 md:py-28">
+    <section ref={ref} className="relative pt-10 pb-20 md:pt-16 md:pb-28">
       <div className="mx-auto max-w-7xl px-6">
         <div className="feature-heading mx-auto max-w-2xl text-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1 text-xs text-muted-foreground">
@@ -120,3 +120,4 @@ export function Features() {
     </section>
   )
 }
+
