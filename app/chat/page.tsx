@@ -24,11 +24,11 @@ export default function ChatbotPage() {
           </p>
         </div>
 
-        <GlowingCard className="flex h-[500px] flex-col justify-between p-6">
+        <GlowingCard className="flex h-500px flex-col justify-between p-6">
           <div className="flex-1 space-y-4 overflow-y-auto pr-4">
             {/* Initial AI Message */}
             <div className="flex gap-3">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <div className="flex h-8s w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                 <Bot className="h-5 w-5" />
               </div>
               <div className="rounded-xl bg-muted p-4 text-sm text-muted-foreground shadow-sm">

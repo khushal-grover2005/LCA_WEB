@@ -1,13 +1,12 @@
 import { NextRequest } from "next/server"
 import { updateSession } from "@/lib/supabase/proxy"
 
-// 1. Rename 'middleware' to 'proxy'
 export async function proxy(request: NextRequest) {
   return await updateSession(request)
 }
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|auth/callback|auth/login|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 }
