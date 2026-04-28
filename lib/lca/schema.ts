@@ -716,3 +716,4 @@ export function getRoutesForMetal(metal: string | undefined): readonly string[] 
 export const FIELDS_BY_KEY: Record<string, LcaField> = Object.fromEntries(
   LCA_FIELDS.map((f) => [f.key, f]),
 )
+

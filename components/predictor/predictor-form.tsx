@@ -30,6 +30,9 @@ const OPTIONAL_GROUP_ORDER: Array<(typeof FIELD_GROUPS)[number]["key"]> = [
   "meta",
 ]
 
+// Exclude output-only metrics from the form
+const HIDDEN_FIELDS = new Set(["data_completeness_score", "recommended_action"])
+
 export function PredictorForm({ authenticated }: { authenticated: boolean }) {
   const ref = useRef<HTMLDivElement>(null)
   const resultsRef = useRef<HTMLDivElement>(null)
@@ -106,7 +109,7 @@ export function PredictorForm({ authenticated }: { authenticated: boolean }) {
     <div ref={ref} className="flex flex-col gap-8">
       <form onSubmit={onSubmit} className="flex flex-col gap-6">
         {/* Required identity card */}
-        <div className="predictor-enter rounded-xl border border-primary/30 bg-gradient-to-br from-card to-primary/5 p-6">
+        <div className="predictor-enter rounded-xl border border-primary/30 bg-linear-to-br from-card to-primary/5 p-6">
           <div className="mb-5 flex items-center gap-2">
             <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
               1
@@ -151,7 +154,7 @@ export function PredictorForm({ authenticated }: { authenticated: boolean }) {
           {OPTIONAL_GROUP_ORDER.map((groupKey) => {
             const meta = FIELD_GROUPS.find((g) => g.key === groupKey)!
             const fields = LCA_FIELDS.filter(
-              (f) => f.group === groupKey && !REQUIRED_KEYS.has(f.key),
+              (f) => f.group === groupKey && !REQUIRED_KEYS.has(f.key) && !HIDDEN_FIELDS.has(f.key),
             )
             if (fields.length === 0) return null
             return (

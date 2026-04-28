@@ -15,25 +15,12 @@ export function SiteFooter() {
           </span>
         </div>
         <nav className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
-          <Link href="/predictor" className="hover:text-foreground">
-            Predictor
-          </Link>
-          <Link href="/dashboard" className="hover:text-foreground">
-            Dashboard
-          </Link>
-          <Link href="/auth/login" className="hover:text-foreground">
-            Sign in
-          </Link>
-          <a
-            href="https://huggingface.co/spaces/khushal-grover2005/LCA_predictor"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-foreground"
-          >
-            Research
-          </a>
+          <span className="text-xs text-muted-foreground">
+            © {new Date().getFullYear()} MetalCycle. All rights reserved.
+          </span>
         </nav>
       </div>
     </footer>
   )
 }
+

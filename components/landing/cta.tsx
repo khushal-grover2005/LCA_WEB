@@ -15,14 +15,21 @@ export function CTA() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.from(".cta-content > *", {
-        y: 30,
-        opacity: 0,
+      // Set initial state explicitly
+      gsap.set(".cta-content > *", { y: 40, opacity: 0 });
+
+      gsap.to(".cta-content > *", {
+        y: 0,
+        opacity: 1,
         duration: 0.7,
         stagger: 0.08,
         ease: "power3.out",
-        scrollTrigger: { trigger: ".cta-content", start: "top 80%" },
-      })
+        scrollTrigger: {
+          trigger: ".cta-content",
+          start: "top 85%", // Trigger earlier
+          toggleActions: "play none none none"
+        },
+      });
     }, ref)
     return () => ctx.revert()
   }, [])

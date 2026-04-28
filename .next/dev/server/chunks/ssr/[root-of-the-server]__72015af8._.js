@@ -1590,9 +1590,9 @@ function OptionalGroup({ title, description, fields, state, enabledOptional, met
                 className: "border-t border-border px-5 py-5",
                 children: [
                     activeFields.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "mb-5 grid grid-cols-1 gap-5 md:grid-cols-2",
+                        className: "mb-5 grid grid-cols-1 gap-6 md:grid-cols-2",
                         children: activeFields.map((f)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "relative",
+                                className: "relative rounded-lg border border-border/30 bg-muted/20 p-4 pt-8",
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$predictor$2f$field$2d$row$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["FieldRow"], {
                                         field: f,
@@ -1610,10 +1610,10 @@ function OptionalGroup({ title, description, fields, state, enabledOptional, met
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                         type: "button",
                                         onClick: ()=>onToggle(f.key, false),
-                                        className: "absolute -top-1 right-0 rounded-full p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive",
+                                        className: "absolute top-2 right-2 rounded-full p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive",
                                         "aria-label": `Remove ${f.label}`,
                                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$x$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__X$3e$__["X"], {
-                                            className: "h-3.5 w-3.5"
+                                            className: "h-4 w-4"
                                         }, void 0, false, {
                                             fileName: "[project]/components/predictor/optional-group.tsx",
                                             lineNumber: 85,
@@ -2600,6 +2600,11 @@ const OPTIONAL_GROUP_ORDER = [
     "economic",
     "meta"
 ];
+// Exclude output-only metrics from the form
+const HIDDEN_FIELDS = new Set([
+    "data_completeness_score",
+    "recommended_action"
+]);
 function PredictorForm({ authenticated }) {
     const ref = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(null);
     const resultsRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(null);
@@ -2664,7 +2669,7 @@ function PredictorForm({ authenticated }) {
                 className: "flex flex-col gap-6",
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "predictor-enter rounded-xl border border-primary/30 bg-gradient-to-br from-card to-primary/5 p-6",
+                        className: "predictor-enter rounded-xl border border-primary/30 bg-linear-to-br from-card to-primary/5 p-6",
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "mb-5 flex items-center gap-2",
@@ -2674,7 +2679,7 @@ function PredictorForm({ authenticated }) {
                                         children: "1"
                                     }, void 0, false, {
                                         fileName: "[project]/components/predictor/predictor-form.tsx",
-                                        lineNumber: 111,
+                                        lineNumber: 114,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -2682,7 +2687,7 @@ function PredictorForm({ authenticated }) {
                                         children: "Required inputs"
                                     }, void 0, false, {
                                         fileName: "[project]/components/predictor/predictor-form.tsx",
-                                        lineNumber: 114,
+                                        lineNumber: 117,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2690,13 +2695,13 @@ function PredictorForm({ authenticated }) {
                                         children: "Everything else is optional."
                                     }, void 0, false, {
                                         fileName: "[project]/components/predictor/predictor-form.tsx",
-                                        lineNumber: 117,
+                                        lineNumber: 120,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/predictor/predictor-form.tsx",
-                                lineNumber: 110,
+                                lineNumber: 113,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2711,18 +2716,18 @@ function PredictorForm({ authenticated }) {
                                         onBlur: ()=>markTouched(field.key)
                                     }, field.key, false, {
                                         fileName: "[project]/components/predictor/predictor-form.tsx",
-                                        lineNumber: 123,
+                                        lineNumber: 126,
                                         columnNumber: 15
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/components/predictor/predictor-form.tsx",
-                                lineNumber: 121,
+                                lineNumber: 124,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/predictor/predictor-form.tsx",
-                        lineNumber: 109,
+                        lineNumber: 112,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2736,7 +2741,7 @@ function PredictorForm({ authenticated }) {
                                         children: "2"
                                     }, void 0, false, {
                                         fileName: "[project]/components/predictor/predictor-form.tsx",
-                                        lineNumber: 140,
+                                        lineNumber: 143,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -2744,7 +2749,7 @@ function PredictorForm({ authenticated }) {
                                         children: "Optional parameters"
                                     }, void 0, false, {
                                         fileName: "[project]/components/predictor/predictor-form.tsx",
-                                        lineNumber: 143,
+                                        lineNumber: 146,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2752,18 +2757,18 @@ function PredictorForm({ authenticated }) {
                                         children: "Add only what you know — the rest will be intelligently estimated."
                                     }, void 0, false, {
                                         fileName: "[project]/components/predictor/predictor-form.tsx",
-                                        lineNumber: 146,
+                                        lineNumber: 149,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/predictor/predictor-form.tsx",
-                                lineNumber: 139,
+                                lineNumber: 142,
                                 columnNumber: 11
                             }, this),
                             OPTIONAL_GROUP_ORDER.map((groupKey)=>{
                                 const meta = __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$lca$2f$schema$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["FIELD_GROUPS"].find((g)=>g.key === groupKey);
-                                const fields = __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$lca$2f$schema$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["LCA_FIELDS"].filter((f)=>f.group === groupKey && !REQUIRED_KEYS.has(f.key));
+                                const fields = __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$lca$2f$schema$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["LCA_FIELDS"].filter((f)=>f.group === groupKey && !REQUIRED_KEYS.has(f.key) && !HIDDEN_FIELDS.has(f.key));
                                 if (fields.length === 0) return null;
                                 return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$predictor$2f$optional$2d$group$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["OptionalGroup"], {
                                     title: meta.label,
@@ -2777,14 +2782,14 @@ function PredictorForm({ authenticated }) {
                                     onToggle: toggleOptional
                                 }, groupKey, false, {
                                     fileName: "[project]/components/predictor/predictor-form.tsx",
-                                    lineNumber: 158,
+                                    lineNumber: 161,
                                     columnNumber: 15
                                 }, this);
                             })
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/predictor/predictor-form.tsx",
-                        lineNumber: 138,
+                        lineNumber: 141,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2798,7 +2803,7 @@ function PredictorForm({ authenticated }) {
                                             className: "h-4 w-4 text-primary"
                                         }, void 0, false, {
                                             fileName: "[project]/components/predictor/predictor-form.tsx",
-                                            lineNumber: 186,
+                                            lineNumber: 189,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2810,13 +2815,13 @@ function PredictorForm({ authenticated }) {
                                                     children: "READY"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/predictor/predictor-form.tsx",
-                                                    lineNumber: 188,
+                                                    lineNumber: 191,
                                                     columnNumber: 34
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/predictor/predictor-form.tsx",
-                                            lineNumber: 187,
+                                            lineNumber: 190,
                                             columnNumber: 17
                                         }, this)
                                     ]
@@ -2826,7 +2831,7 @@ function PredictorForm({ authenticated }) {
                                             className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["cn"])("h-4 w-4", errorCount > 0 ? "text-destructive" : "text-muted-foreground")
                                         }, void 0, false, {
                                             fileName: "[project]/components/predictor/predictor-form.tsx",
-                                            lineNumber: 193,
+                                            lineNumber: 196,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2834,14 +2839,14 @@ function PredictorForm({ authenticated }) {
                                             children: errorCount > 0 ? `Input Error: ${errorCount} field(s) require attention.` : "System Status: Awaiting valid identity inputs."
                                         }, void 0, false, {
                                             fileName: "[project]/components/predictor/predictor-form.tsx",
-                                            lineNumber: 194,
+                                            lineNumber: 197,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true)
                             }, void 0, false, {
                                 fileName: "[project]/components/predictor/predictor-form.tsx",
-                                lineNumber: 183,
+                                lineNumber: 186,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2861,14 +2866,14 @@ function PredictorForm({ authenticated }) {
                                                 className: "mr-2 h-3.5 w-3.5"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/predictor/predictor-form.tsx",
-                                                lineNumber: 213,
+                                                lineNumber: 216,
                                                 columnNumber: 15
                                             }, this),
                                             "Reset"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/predictor/predictor-form.tsx",
-                                        lineNumber: 203,
+                                        lineNumber: 206,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -2882,7 +2887,7 @@ function PredictorForm({ authenticated }) {
                                                     className: "mr-2 h-4 w-4 animate-spin"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/predictor/predictor-form.tsx",
-                                                    lineNumber: 229,
+                                                    lineNumber: 232,
                                                     columnNumber: 19
                                                 }, this),
                                                 "Predicting…"
@@ -2893,7 +2898,7 @@ function PredictorForm({ authenticated }) {
                                                     className: "mr-2 h-4 w-4"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/predictor/predictor-form.tsx",
-                                                    lineNumber: 234,
+                                                    lineNumber: 237,
                                                     columnNumber: 19
                                                 }, this),
                                                 "Initiate Analysis"
@@ -2901,19 +2906,19 @@ function PredictorForm({ authenticated }) {
                                         }, void 0, true)
                                     }, void 0, false, {
                                         fileName: "[project]/components/predictor/predictor-form.tsx",
-                                        lineNumber: 216,
+                                        lineNumber: 219,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/predictor/predictor-form.tsx",
-                                lineNumber: 202,
+                                lineNumber: 205,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/predictor/predictor-form.tsx",
-                        lineNumber: 175,
+                        lineNumber: 178,
                         columnNumber: 9
                     }, this),
                     submitError && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2925,31 +2930,31 @@ function PredictorForm({ authenticated }) {
                                     className: "mt-0.5 h-4 w-4 shrink-0"
                                 }, void 0, false, {
                                     fileName: "[project]/components/predictor/predictor-form.tsx",
-                                    lineNumber: 245,
+                                    lineNumber: 248,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                     children: submitError
                                 }, void 0, false, {
                                     fileName: "[project]/components/predictor/predictor-form.tsx",
-                                    lineNumber: 246,
+                                    lineNumber: 249,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/predictor/predictor-form.tsx",
-                            lineNumber: 244,
+                            lineNumber: 247,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/predictor/predictor-form.tsx",
-                        lineNumber: 243,
+                        lineNumber: 246,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/predictor/predictor-form.tsx",
-                lineNumber: 107,
+                lineNumber: 110,
                 columnNumber: 7
             }, this),
             response && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2961,18 +2966,18 @@ function PredictorForm({ authenticated }) {
                     authenticated: authenticated
                 }, void 0, false, {
                     fileName: "[project]/components/predictor/predictor-form.tsx",
-                    lineNumber: 254,
+                    lineNumber: 257,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/predictor/predictor-form.tsx",
-                lineNumber: 253,
+                lineNumber: 256,
                 columnNumber: 9
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/predictor/predictor-form.tsx",
-        lineNumber: 106,
+        lineNumber: 109,
         columnNumber: 5
     }, this);
 }

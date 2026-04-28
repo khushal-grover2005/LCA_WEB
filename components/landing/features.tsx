@@ -10,6 +10,7 @@ import {
   ShieldCheck,
   Sparkles,
   TrendingDown,
+  X,
 } from "lucide-react"
 import { GlowingCard } from "@/components/ui/glowing-card"
 
@@ -53,27 +54,39 @@ export function Features() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.from(".feature-card", {
-        y: 40,
-        opacity: 0,
-        duration: 0.7,
-        stagger: 0.08,
+      // Remove the GSAP animation entirely for debugging if needed,
+      // but let's try a simpler approach first:
+
+      gsap.fromTo(
+        ".feature-card",
+        { y: 40, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.7,
+          stagger: 0.15,
         ease: "power3.out",
         scrollTrigger: {
           trigger: ".feature-grid",
-          start: "top 80%",
+            start: "top bottom", // Trigger as soon as the top of the grid hits the bottom of the viewport
+            toggleActions: "play none none none",
         },
-      })
-      gsap.from(".feature-heading", {
-        y: 20,
-        opacity: 0,
-        duration: 0.7,
+        }
+      )
+      gsap.fromTo(
+        ".feature-heading",
+        { y: 20, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.7,
         ease: "power3.out",
         scrollTrigger: {
           trigger: ".feature-heading",
-          start: "top 85%",
+            start: "top bottom",
         },
-      })
+        }
+      )
     }, ref)
     return () => ctx.revert()
   }, [])

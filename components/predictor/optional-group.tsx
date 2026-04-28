@@ -64,9 +64,9 @@ export function OptionalGroup({
       {open && (
         <div className="border-t border-border px-5 py-5">
           {activeFields.length > 0 && (
-            <div className="mb-5 grid grid-cols-1 gap-5 md:grid-cols-2">
+            <div className="mb-5 grid grid-cols-1 gap-6 md:grid-cols-2">
               {activeFields.map((f) => (
-                <div key={f.key} className="relative">
+                <div key={f.key} className="relative rounded-lg border border-border/30 bg-muted/20 p-4 pt-8">
                   <FieldRow
                     field={f}
                     value={state[f.key].value}
@@ -79,10 +79,10 @@ export function OptionalGroup({
                   <button
                     type="button"
                     onClick={() => onToggle(f.key, false)}
-                    className="absolute -top-1 right-0 rounded-full p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                    className="absolute top-2 right-2 rounded-full p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                     aria-label={`Remove ${f.label}`}
                   >
-                    <X className="h-3.5 w-3.5" />
+                    <X className="h-4 w-4" />
                   </button>
                 </div>
               ))}
@@ -121,3 +121,4 @@ export function OptionalGroup({
     </div>
   )
 }
+
