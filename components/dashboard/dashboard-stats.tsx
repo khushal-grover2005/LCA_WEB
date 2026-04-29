@@ -82,11 +82,11 @@ export function DashboardStats({ rows }: { rows: Row[] }) {
   ]
 
     return (
-      <div ref={ref} className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
+      <div ref={ref} className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full items-stretch">
         {stats.map((s) => {
           const Icon = s.icon
           return (
-            <GlowingCard key={s.label} className="stat-card opacity-100 flex flex-col h-full">
+            <GlowingCard key={s.label} className="stat-card opacity-100 flex flex-col h-full w-full">
               <div className="flex flex-col flex-1">
                 <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground font-semibold">
                   <Icon
@@ -104,11 +104,11 @@ export function DashboardStats({ rows }: { rows: Row[] }) {
                   {s.value}
                 </div>
               </div>
-              <div className="mt-auto pt-2 min-h-[1.5rem]">
-                {s.hint && (
-                  <div className="text-[10px] text-muted-foreground">{s.hint}</div>
-                )}
-              </div>
+              {s.hint && (
+                <div className="mt-3 pt-2 border-t border-border/50 text-[10px] text-muted-foreground">
+                  {s.hint}
+                </div>
+              )}
             </GlowingCard>
           )
         })}
