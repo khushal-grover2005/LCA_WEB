@@ -179,7 +179,7 @@ export function PredictorForm({ authenticated }: { authenticated: boolean }) {
           className={cn(
             "predictor-enter sticky bottom-4 z-10 flex flex-wrap items-center justify-between gap-4 rounded-xl border bg-card/95 p-4 shadow-xl backdrop-blur transition-all duration-500",
             isValid
-              ? "border-primary/40 shadow-primary/10 animate-button-ready"
+              ? "border-primary/40 shadow-primary/20 animate-button-ready"
               : "border-border shadow-none",
           )}
         >
@@ -223,8 +223,8 @@ export function PredictorForm({ authenticated }: { authenticated: boolean }) {
               className={cn(
                 "transition-all duration-300 font-semibold uppercase tracking-wider",
                 isValid
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90 opacity-100 shadow-[0_0_15px_rgba(234,120,52,0.5)]"
-                  : "bg-muted text-muted-foreground cursor-not-allowed opacity-50 grayscale",
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90 opacity-100 shadow-[0_0_20px_rgba(234,120,52,0.6)]"
+                  : "bg-muted text-muted-foreground cursor-not-allowed opacity-40 grayscale",
               )}
             >
               {loading ? (
@@ -264,5 +264,4 @@ export function PredictorForm({ authenticated }: { authenticated: boolean }) {
     </div>
   )
 }
-
 
