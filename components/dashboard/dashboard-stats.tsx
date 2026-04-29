@@ -22,7 +22,10 @@ export function DashboardStats({ rows }: { rows: Row[] }) {
         duration: 0.5,
         stagger: 0.08,
         ease: "power3.out",
-        clearProps: "opacity", // Ensure opacity is cleared after animation
+        onComplete: () => {
+            const elements = document.querySelectorAll('.stat-card');
+            elements.forEach((el) => (el as HTMLElement).style.opacity = '1');
+        }
       })
     }, ref)
     return () => ctx.revert()
@@ -108,4 +111,5 @@ export function DashboardStats({ rows }: { rows: Row[] }) {
     </div>
   )
 }
+
 
