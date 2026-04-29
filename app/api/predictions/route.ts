@@ -43,6 +43,7 @@ export async function POST(request: NextRequest) {
         typeof r.reuse_potential === "number" ? r.reuse_potential : null,
       input_payload: body.input_payload,
       response: body.response,
+      visualizations: body.response.visualizations ?? {},
       imputed_fields: body.response.imputed_fields ?? [],
     })
     .select("id")
@@ -53,3 +54,4 @@ export async function POST(request: NextRequest) {
   }
   return NextResponse.json({ id: data.id })
 }
+
