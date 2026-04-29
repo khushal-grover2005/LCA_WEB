@@ -15,17 +15,16 @@ export function DashboardStats({ rows }: { rows: Row[] }) {
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    // We use a selector to ensure elements are hidden before animation starts
+    // but visible if GSAP fails to load.
     const ctx = gsap.context(() => {
       gsap.from(".stat-card", {
-        y: 16,
+        y: 12,
         opacity: 0,
-        duration: 0.5,
-        stagger: 0.08,
-        ease: "power3.out",
-        onComplete: () => {
-          const elements = document.querySelectorAll('.stat-card');
-          elements.forEach((el) => (el as HTMLElement).style.opacity = '1');
-        }
+        duration: 0.4,
+        stagger: 0.05,
+        ease: "power2.out",
+        clearProps: "all", // This clears GSAP styles after animation to let CSS take back over
       })
     }, ref)
     return () => ctx.revert()
@@ -73,45 +72,45 @@ export function DashboardStats({ rows }: { rows: Row[] }) {
   ]
 
   return (
-    <div ref={ref} className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
+    <div ref={ref} className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full auto-rows-fr">
       {stats.map((s) => {
         const Icon = s.icon
         return (
           <GlowingCard 
             key={s.label} 
-            className="stat-card opacity-100 flex flex-col h-full min-h-[160px] p-5"
+            className="stat-card flex flex-col h-full min-h-[150px] p-6 relative overflow-hidden"
           >
-            {/* 1. TOP SECTION: Label and Icon */}
-            <div className="h-6 flex items-center gap-2">
-              <div className="flex items-center justify-center w-4 h-4">
+            {/* 1. Fixed Header Lane (24px) */}
+            <div className="h-6 flex items-center gap-2 mb-2">
+              <div className="flex-shrink-0 flex items-center justify-center w-4 h-4">
                 <Icon
-                  className={`h-3.5 w-3.5 ${
+                  className={`h-4 w-4 ${
                     s.tone === "primary" ? "text-primary" : 
                     s.tone === "accent" ? "text-accent" : 
                     "text-muted-foreground"
                   }`}
                 />
               </div>
-              <span className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-bold leading-none">
+              <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold truncate">
                 {s.label}
               </span>
             </div>
 
-            {/* 2. MIDDLE SECTION: The Big Value */}
-            <div className="flex-1 flex items-center pt-2">
+            {/* 2. Expanding Middle Lane (Vertical Center) */}
+            <div className="flex-1 flex items-center">
               <span className="font-serif text-4xl font-semibold tracking-tight leading-none">
                 {s.value}
               </span>
             </div>
 
-            {/* 3. BOTTOM SECTION: The Unit Hint */}
-            <div className="h-4 mt-2 flex items-end">
+            {/* 3. Fixed Footer Lane (16px) */}
+            <div className="h-4 mt-3 flex items-center">
               {s.hint ? (
-                <span className="text-[10px] text-muted-foreground/70 font-medium leading-none">
+                <span className="text-[10px] text-muted-foreground/60 font-medium leading-none">
                   {s.hint}
                 </span>
               ) : (
-                <div className="h-px w-full" aria-hidden="true" />
+                <div className="h-px w-full bg-transparent" aria-hidden="true" />
               )}
             </div>
           </GlowingCard>
