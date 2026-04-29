@@ -23,8 +23,8 @@ export function DashboardStats({ rows }: { rows: Row[] }) {
         stagger: 0.08,
         ease: "power3.out",
         onComplete: () => {
-            const elements = document.querySelectorAll('.stat-card');
-            elements.forEach((el) => (el as HTMLElement).style.opacity = '1');
+          const elements = document.querySelectorAll('.stat-card');
+          elements.forEach((el) => (el as HTMLElement).style.opacity = '1');
         }
       })
     }, ref)
@@ -81,38 +81,50 @@ export function DashboardStats({ rows }: { rows: Row[] }) {
     },
   ]
 
-    return (
-      <div ref={ref} className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full items-stretch">
-        {stats.map((s) => {
-          const Icon = s.icon
-          return (
-            <GlowingCard key={s.label} className="stat-card opacity-100 flex flex-col h-full w-full">
-              <div className="flex flex-col flex-1">
-                <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground font-semibold">
-                  <Icon
-                    className={`h-3.5 w-3.5 ${
-                      s.tone === "primary"
-                        ? "text-primary"
-                        : s.tone === "accent"
-                          ? "text-accent"
-                          : "text-muted-foreground"
-                    }`}
-                  />
-                  {s.label}
-                </div>
-                <div className="mt-2 font-serif text-3xl font-semibold">
-                  {s.value}
-                </div>
+  return (
+    <div ref={ref} className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
+      {stats.map((s) => {
+        const Icon = s.icon
+        return (
+          <GlowingCard 
+            key={s.label} 
+            className="stat-card opacity-100 flex flex-col h-full min-h-[140px] p-6"
+          >
+            {/* 1. Header Row - Aligns Icons and Labels */}
+            <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+              <Icon
+                className={`h-3.5 w-3.5 ${
+                  s.tone === "primary"
+                    ? "text-primary"
+                    : s.tone === "accent"
+                      ? "text-accent"
+                      : "text-muted-foreground"
+                }`}
+              />
+              {s.label}
+            </div>
+
+            {/* 2. Middle Section - Absorbs available space to keep content parallel */}
+            <div className="flex-1 flex flex-col justify-center mt-2">
+              <div className="font-serif text-3xl font-semibold">
+                {s.value}
               </div>
-              {s.hint && (
-                <div className="mt-3 pt-2 border-t border-border/50 text-[10px] text-muted-foreground">
+            </div>
+
+            {/* 3. Footer Section - Fixed height placeholder to prevent shifting */}
+            <div className="mt-auto h-4">
+              {s.hint ? (
+                <div className="text-[10px] text-muted-foreground leading-none">
                   {s.hint}
                 </div>
+              ) : (
+                /* Invisible spacer to maintain layout symmetry */
+                <div className="h-full w-full" aria-hidden="true" />
               )}
-            </GlowingCard>
-          )
-        })}
-      </div>
-    )
+            </div>
+          </GlowingCard>
+        )
+      })}
+    </div>
+  )
 }
-
