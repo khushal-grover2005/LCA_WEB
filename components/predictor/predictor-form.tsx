@@ -223,7 +223,7 @@ export function PredictorForm({ authenticated }: { authenticated: boolean }) {
               className={cn(
                 "transition-all duration-300 font-semibold uppercase tracking-wider",
                 isValid
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90 opacity-100 shadow-[0_0_15px_rgba(234,120,52,0.5)]"
                   : "bg-muted text-muted-foreground cursor-not-allowed opacity-50 grayscale",
               )}
             >
@@ -264,4 +264,5 @@ export function PredictorForm({ authenticated }: { authenticated: boolean }) {
     </div>
   )
 }
+
 
