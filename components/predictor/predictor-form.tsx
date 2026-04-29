@@ -177,7 +177,7 @@ export function PredictorForm({ authenticated }: { authenticated: boolean }) {
         {/* Submit bar */}
         <div
           className={cn(
-            "predictor-enter sticky bottom-4 z-10 flex flex-wrap items-center justify-between gap-4 rounded-xl border bg-card/95 p-4 shadow-xl backdrop-blur transition-all duration-500 opacity-100",
+            "sticky bottom-4 z-10 flex flex-wrap items-center justify-between gap-4 rounded-xl border bg-card/95 p-4 shadow-xl backdrop-blur transition-all duration-500",
             isValid
               ? "border-primary/40 shadow-primary/20 animate-button-ready"
               : "border-border shadow-none",
