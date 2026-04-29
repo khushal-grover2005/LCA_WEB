@@ -16,7 +16,7 @@ export function GlowingCard({
     <div
       ref={ref}
       className={cn(
-        "group relative overflow-hidden rounded-xl border border-border/50 bg-card p-6 transition-all duration-300 hover:border-primary/50",
+        "group relative overflow-hidden rounded-xl border border-primary/20 bg-card/80 p-6 shadow-lg transition-all duration-300 hover:border-primary/50",
         "before:absolute before:inset-0 before:opacity-0 before:transition-opacity before:duration-500 hover:before:opacity-100",
         "before:bg-[radial-gradient(400px_circle_at_var(--mouse-x,0px)_var(--mouse-y,0px),rgba(234,120,52,0.15),transparent_80%)]",
         className,
@@ -36,3 +36,4 @@ export function GlowingCard({
     </div>
   )
 }
+

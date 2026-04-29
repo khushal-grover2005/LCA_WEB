@@ -22,6 +22,7 @@ export function DashboardStats({ rows }: { rows: Row[] }) {
         duration: 0.5,
         stagger: 0.08,
         ease: "power3.out",
+        clearProps: "opacity", // Ensure opacity is cleared after animation
       })
     }, ref)
     return () => ctx.revert()
@@ -82,8 +83,8 @@ export function DashboardStats({ rows }: { rows: Row[] }) {
       {stats.map((s) => {
         const Icon = s.icon
         return (
-          <GlowingCard key={s.label} className="stat-card">
-            <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground">
+          <GlowingCard key={s.label} className="stat-card opacity-100">
+            <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground font-semibold">
               <Icon
                 className={`h-3.5 w-3.5 ${
                   s.tone === "primary"
