@@ -82,33 +82,35 @@ export function DashboardStats({ rows }: { rows: Row[] }) {
   ]
 
     return (
-      <div ref={ref} className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full">
-      {stats.map((s) => {
-        const Icon = s.icon
-        return (
-          <GlowingCard key={s.label} className="stat-card opacity-100">
-            <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground font-semibold">
-              <Icon
-                className={`h-3.5 w-3.5 ${
-                  s.tone === "primary"
-                    ? "text-primary"
-                    : s.tone === "accent"
-                      ? "text-accent"
-                      : "text-muted-foreground"
-                }`}
-              />
-              {s.label}
-            </div>
-            <div className="mt-2 font-serif text-3xl font-semibold">
-              {s.value}
-            </div>
-            {s.hint && (
-              <div className="text-[10px] text-muted-foreground">{s.hint}</div>
-            )}
-          </GlowingCard>
-        )
-      })}
-    </div>
-  )
+      <div ref={ref} className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
+        {stats.map((s) => {
+          const Icon = s.icon
+          return (
+            <GlowingCard key={s.label} className="stat-card opacity-100 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+                  <Icon
+                    className={`h-3.5 w-3.5 ${
+                      s.tone === "primary"
+                        ? "text-primary"
+                        : s.tone === "accent"
+                          ? "text-accent"
+                          : "text-muted-foreground"
+                    }`}
+                  />
+                  {s.label}
+                </div>
+                <div className="mt-2 font-serif text-3xl font-semibold">
+                  {s.value}
+                </div>
+              </div>
+              {s.hint && (
+                <div className="mt-2 text-[10px] text-muted-foreground">{s.hint}</div>
+              )}
+            </GlowingCard>
+          )
+        })}
+      </div>
+    )
 }
 
