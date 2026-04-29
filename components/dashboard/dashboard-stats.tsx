@@ -82,7 +82,7 @@ export function DashboardStats({ rows }: { rows: Row[] }) {
   ]
 
     return (
-    <div ref={ref} className="grid grid-cols-2 gap-4 md:grid-cols-4">
+      <div ref={ref} className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full">
       {stats.map((s) => {
         const Icon = s.icon
         return (
