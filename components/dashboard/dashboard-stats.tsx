@@ -86,8 +86,8 @@ export function DashboardStats({ rows }: { rows: Row[] }) {
         {stats.map((s) => {
           const Icon = s.icon
           return (
-            <GlowingCard key={s.label} className="stat-card opacity-100 flex flex-col justify-between">
-              <div>
+            <GlowingCard key={s.label} className="stat-card opacity-100 flex flex-col h-full">
+              <div className="flex flex-col flex-1">
                 <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground font-semibold">
                   <Icon
                     className={`h-3.5 w-3.5 ${
@@ -104,9 +104,11 @@ export function DashboardStats({ rows }: { rows: Row[] }) {
                   {s.value}
                 </div>
               </div>
-              {s.hint && (
-                <div className="mt-2 text-[10px] text-muted-foreground">{s.hint}</div>
-              )}
+              <div className="mt-auto pt-2 min-h-[1.5rem]">
+                {s.hint && (
+                  <div className="text-[10px] text-muted-foreground">{s.hint}</div>
+                )}
+              </div>
             </GlowingCard>
           )
         })}
