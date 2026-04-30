@@ -13,24 +13,10 @@ import type { PredictResponse } from "@/lib/lca/types"
 import { cn } from "@/lib/utils"
 
 const REQUIRED_KEYS = new Set(LCA_FIELDS.filter((f) => f.required).map((f) => f.key))
-
-// Identity fields shown inline in the "required" card
-const IDENTITY_FIELDS = LCA_FIELDS.filter(
-  (f) => f.group === "identity" && f.required,
-)
-
-// Optional groups shown below (identity extras are merged into 'identity' optional group)
+const IDENTITY_FIELDS = LCA_FIELDS.filter((f) => f.group === "identity" && f.required)
 const OPTIONAL_GROUP_ORDER: Array<(typeof FIELD_GROUPS)[number]["key"]> = [
-  "identity",
-  "process",
-  "transport",
-  "environmental",
-  "circularity",
-  "economic",
-  "meta",
+  "identity", "process", "transport", "environmental", "circularity", "economic", "meta",
 ]
-
-// Exclude output-only metrics from the form
 const HIDDEN_FIELDS = new Set(["data_completeness_score", "recommended_action"])
 
 export function PredictorForm({ authenticated }: { authenticated: boolean }) {
@@ -51,9 +37,7 @@ export function PredictorForm({ authenticated }: { authenticated: boolean }) {
   const [loading, setLoading] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [response, setResponse] = useState<PredictResponse | null>(null)
-  const [submittedPayload, setSubmittedPayload] = useState<
-    Record<string, string | number>
-  >({})
+  const [submittedPayload, setSubmittedPayload] = useState<Record<string, string | number>>({})
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -85,16 +69,9 @@ export function PredictorForm({ authenticated }: { authenticated: boolean }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       })
-      const body = (await res.json()) as PredictResponse & {
-        errors?: Record<string, string>
-      }
+      const body = (await res.json()) as PredictResponse & { errors?: Record<string, string> }
       if (!res.ok) {
-        throw new Error(
-          body.message ??
-            (body.errors
-              ? Object.values(body.errors).slice(0, 2).join(" ")
-              : `Request failed (${res.status})`),
-        )
+        throw new Error(body.message ?? (body.errors ? Object.values(body.errors).slice(0, 2).join(" ") : `Request failed (${res.status})`))
       }
       setResponse(body)
       setSubmittedPayload(payload)
@@ -111,15 +88,9 @@ export function PredictorForm({ authenticated }: { authenticated: boolean }) {
         {/* Required identity card */}
         <div className="predictor-enter rounded-xl border border-primary/30 bg-linear-to-br from-card to-primary/5 p-6">
           <div className="mb-5 flex items-center gap-2">
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
-              1
-            </span>
-            <h2 className="font-serif text-lg font-semibold">
-              Required inputs
-            </h2>
-            <span className="text-xs text-muted-foreground">
-              Everything else is optional.
-            </span>
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">1</span>
+            <h2 className="font-serif text-lg font-semibold">Required inputs</h2>
+            <span className="text-xs text-muted-foreground">Everything else is optional.</span>
           </div>
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             {IDENTITY_FIELDS.map((field) => (
@@ -140,22 +111,13 @@ export function PredictorForm({ authenticated }: { authenticated: boolean }) {
         {/* Optional groups */}
         <div className="predictor-enter flex flex-col gap-3">
           <div className="flex items-center gap-2">
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-muted text-xs font-semibold text-foreground">
-              2
-            </span>
-            <h2 className="font-serif text-lg font-semibold">
-              Optional parameters
-            </h2>
-            <span className="text-xs text-muted-foreground">
-              Add only what you know — the rest will be intelligently estimated.
-            </span>
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-muted text-xs font-semibold text-foreground">2</span>
+            <h2 className="font-serif text-lg font-semibold">Optional parameters</h2>
+            <span className="text-xs text-muted-foreground">Add only what you know — the rest will be estimated.</span>
           </div>
-
           {OPTIONAL_GROUP_ORDER.map((groupKey) => {
             const meta = FIELD_GROUPS.find((g) => g.key === groupKey)!
-            const fields = LCA_FIELDS.filter(
-              (f) => f.group === groupKey && !REQUIRED_KEYS.has(f.key) && !HIDDEN_FIELDS.has(f.key),
-            )
+            const fields = LCA_FIELDS.filter((f) => f.group === groupKey && !REQUIRED_KEYS.has(f.key) && !HIDDEN_FIELDS.has(f.key))
             if (fields.length === 0) return null
             return (
               <OptionalGroup
@@ -174,27 +136,26 @@ export function PredictorForm({ authenticated }: { authenticated: boolean }) {
           })}
         </div>
 
-        {/* Submit bar */}
+        {/* Submit bar - RESPONSIVE FIX APPLIED HERE */}
         <div
           className={cn(
-            "sticky bottom-4 z-10 flex flex-wrap items-center justify-between gap-4 rounded-xl border bg-card/95 p-4 shadow-xl backdrop-blur transition-all duration-500",
-            isValid
-              ? "border-primary/40 shadow-primary/20 animate-button-ready"
-              : "border-border shadow-none",
+            "sticky bottom-4 z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-xl border bg-card/95 p-4 shadow-xl backdrop-blur transition-all duration-500",
+            isValid ? "border-primary/40 shadow-primary/20 animate-button-ready" : "border-border shadow-none",
           )}
         >
+          {/* Status Text Area */}
           <div className="flex items-center gap-3 text-sm">
             {isValid ? (
               <>
-                <Sparkles className="h-4 w-4 text-primary" />
+                <Sparkles className="h-4 w-4 text-primary shrink-0" />
                 <span className="text-foreground">
                   System Status: <span className="font-semibold text-primary">READY</span>
                 </span>
               </>
             ) : (
               <>
-                <AlertCircle className={cn("h-4 w-4", errorCount > 0 ? "text-destructive" : "text-muted-foreground")} />
-                <span className="text-muted-foreground">
+                <AlertCircle className={cn("h-4 w-4 shrink-0", errorCount > 0 ? "text-destructive" : "text-muted-foreground")} />
+                <span className="text-muted-foreground leading-tight">
                   {errorCount > 0
                     ? `Input Error: ${errorCount} field(s) require attention.`
                     : "System Status: Awaiting valid identity inputs."}
@@ -202,11 +163,14 @@ export function PredictorForm({ authenticated }: { authenticated: boolean }) {
               </>
             )}
           </div>
-          <div className="flex items-center gap-2">
+
+          {/* Buttons Area */}
+          <div className="flex items-center gap-2 w-full sm:w-auto">
             <Button
               type="button"
               variant="ghost"
               size="sm"
+              className="flex-1 sm:flex-none"
               onClick={() => {
                 reset()
                 setResponse(null)
@@ -221,7 +185,7 @@ export function PredictorForm({ authenticated }: { authenticated: boolean }) {
               size="lg"
               disabled={!isValid || loading}
               className={cn(
-                "transition-all duration-300 font-semibold uppercase tracking-wider",
+                "flex-1 sm:flex-none transition-all duration-300 font-semibold uppercase tracking-wider text-xs sm:text-sm h-10 sm:h-11",
                 isValid
                   ? "bg-primary text-primary-foreground hover:bg-primary/90 opacity-100 shadow-[0_0_20px_rgba(234,120,52,0.6)]"
                   : "bg-muted text-muted-foreground cursor-not-allowed opacity-40 grayscale",
@@ -234,7 +198,7 @@ export function PredictorForm({ authenticated }: { authenticated: boolean }) {
                 </>
               ) : (
                 <>
-                  <Sparkles className="mr-2 h-4 w-4" />
+                  <Sparkles className="mr-2 h-4 w-4 shrink-0" />
                   Initiate Analysis
                 </>
               )}
@@ -264,4 +228,3 @@ export function PredictorForm({ authenticated }: { authenticated: boolean }) {
     </div>
   )
 }
-

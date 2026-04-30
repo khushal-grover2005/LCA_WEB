@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
-import { Flame, LogOut } from "lucide-react"
+import { Flame, LogOut, Menu } from "lucide-react" // Added Menu icon
 import { Button } from "@/components/ui/button"
 import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
@@ -50,34 +50,33 @@ export function SiteNav() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-40 w-full transition-all duration-300",
+        "sticky top-0 z-[100] w-full transition-all duration-300",
         scrolled
-          ? "border-b border-border/60 bg-background/80 backdrop-blur-xl"
-          : "bg-transparent",
+          ? "border-b border-border/60 bg-background/95 backdrop-blur-xl"
+          : "bg-background/90",
       )}
     >
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-6">
-        <Link href="/" className="flex items-center gap-2">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
+        {/* LOGO */}
+        <Link href="/" className="flex items-center gap-2 shrink-0">
           <span className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-lg shadow-primary/30">
             <Flame className="h-4 w-4" />
           </span>
-          <span className="hidden sm:inline-block font-serif text-lg font-semibold tracking-tight">
+          <span className="hidden xs:inline-block font-serif text-lg font-semibold tracking-tight">
             MetalCycle
           </span>
         </Link>
 
-        <nav className="flex items-center gap-0.5 md:gap-1 overflow-x-auto no-scrollbar">
+        {/* NAVIGATION - Hidden on very small screens, scrollable on medium */}
+        <nav className="hidden md:flex items-center gap-1 mx-4">
           {LINKS.map((link) => {
-            const active =
-              link.href === "/"
-                ? pathname === "/"
-                : pathname.startsWith(link.href)
+            const active = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href)
             return (
               <Link
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  "rounded-md px-2 py-1.5 text-[10px] sm:text-sm transition-colors whitespace-nowrap",
+                  "rounded-md px-3 py-2 text-sm font-medium transition-colors",
                   active
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground hover:text-foreground",
@@ -89,35 +88,43 @@ export function SiteNav() {
           })}
         </nav>
 
-        <div className="flex items-center gap-2 shrink-0">
+        {/* ACTIONS */}
+        <div className="flex items-center gap-2">
+          {/* Mobile Navigation Dropdown/Scroll (Visible only on Mobile) */}
+          <div className="md:hidden flex items-center overflow-x-auto max-w-[150px] no-scrollbar mr-2">
+             <nav className="flex gap-1">
+                {LINKS.slice(0,3).map((link) => ( // Show only first 3 on mobile to save space
+                   <Link key={link.href} href={link.href} className={cn(
+                      "text-[11px] px-2 py-1 rounded-md",
+                      pathname === link.href ? "bg-primary/10 text-primary" : "text-muted-foreground"
+                   )}>
+                      {link.label}
+                   </Link>
+                ))}
+             </nav>
+          </div>
+
           {email ? (
-            <>
+            <div className="flex items-center gap-2">
               <span className="hidden text-xs text-muted-foreground lg:inline">
                 {email}
               </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={signOut}
-                aria-label="Sign out"
-              >
+              <Button variant="ghost" size="sm" onClick={signOut}>
                 <LogOut className="h-4 w-4" />
               </Button>
-            </>
+            </div>
           ) : (
-            <>
-              <Button asChild variant="ghost" size="sm" className="hidden sm:flex">
+            <div className="flex items-center gap-1 sm:gap-2">
+              <Button asChild variant="ghost" size="sm" className="h-8 px-2 text-xs sm:text-sm">
                 <Link href="/auth/login">Sign in</Link>
               </Button>
-              <Button asChild size="sm">
+              <Button asChild size="sm" className="h-8 px-3 text-xs sm:text-sm">
                 <Link href="/auth/sign-up">Join</Link>
               </Button>
-            </>
+            </div>
           )}
         </div>
       </div>
     </header>
   )
 }
-
-
