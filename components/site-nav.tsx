@@ -56,17 +56,17 @@ export function SiteNav() {
           : "bg-transparent",
       )}
     >
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-6">
         <Link href="/" className="flex items-center gap-2">
           <span className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-lg shadow-primary/30">
             <Flame className="h-4 w-4" />
           </span>
-          <span className="font-serif text-lg font-semibold tracking-tight">
+          <span className="hidden sm:inline-block font-serif text-lg font-semibold tracking-tight">
             MetalCycle
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-1 md:flex">
+        <nav className="flex items-center gap-0.5 md:gap-1 overflow-x-auto no-scrollbar">
           {LINKS.map((link) => {
             const active =
               link.href === "/"
@@ -77,7 +77,7 @@ export function SiteNav() {
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  "rounded-md px-3 py-1.5 text-sm transition-colors",
+                  "rounded-md px-2 py-1.5 text-[10px] sm:text-sm transition-colors whitespace-nowrap",
                   active
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground hover:text-foreground",
@@ -89,10 +89,10 @@ export function SiteNav() {
           })}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           {email ? (
             <>
-              <span className="hidden text-xs text-muted-foreground md:inline">
+              <span className="hidden text-xs text-muted-foreground lg:inline">
                 {email}
               </span>
               <Button
@@ -106,11 +106,11 @@ export function SiteNav() {
             </>
           ) : (
             <>
-              <Button asChild variant="ghost" size="sm">
+              <Button asChild variant="ghost" size="sm" className="hidden sm:flex">
                 <Link href="/auth/login">Sign in</Link>
               </Button>
               <Button asChild size="sm">
-                <Link href="/auth/sign-up">Get started</Link>
+                <Link href="/auth/sign-up">Join</Link>
               </Button>
             </>
           )}
@@ -119,4 +119,5 @@ export function SiteNav() {
     </header>
   )
 }
+
 
