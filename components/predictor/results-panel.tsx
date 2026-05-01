@@ -97,7 +97,7 @@ export function ResultsPanel({ response, inputPayload, authenticated }: Props) {
     { key: "gwp_total", label: "Total GWP", icon: Flame, unit: "kg CO₂/kg", tone: "primary" },
     { key: "circularity_index", label: "Circularity", icon: Recycle, digits: 2, tone: "accent" },
     { key: "resource_efficiency", label: "Resource Eff.", icon: Gauge, digits: 2, tone: "cyan" },
-    { key: "recycled_content_est", label: "Recycled %", icon: TrendingUp, unit: "%", digits: 1, tone: "violet" },
+    { key: "recycled_content_est", label: "Recycled %", icon: TrendingUp, digits: 1, tone: "violet" },
     { key: "reuse_potential", label: "Reuse Score", icon: Sparkles, digits: 2, tone: "amber" },
   ]
 
