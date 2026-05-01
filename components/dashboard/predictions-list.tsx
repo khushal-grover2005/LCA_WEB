@@ -110,22 +110,28 @@ export function PredictionsList({
         </div>
       </div>
 
-      <div className="hidden grid-cols-[1.2fr_1.5fr_0.8fr_0.8fr_0.8fr_0.6fr_auto] gap-4 border-b border-border bg-muted/10 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground md:grid">
+      {/* Header Row (Hidden on mobile, perfectly aligned via grid on desktop) */}
+      <div className="hidden grid-cols-[1.2fr_1.5fr_0.8fr_0.8fr_0.8fr_0.6fr_1.2fr] gap-4 border-b border-border bg-muted/10 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground md:grid md:items-center">
         <div>Metal</div>
         <div>Route</div>
         <div className="text-right">GWP</div>
         <div className="text-right">Circularity</div>
         <div className="text-right">Recycled %</div>
         <div>Imputed</div>
-        <div className="text-right">Date</div>
+        {/* Alignment Fix: Match the row's layout so "Date" sits perfectly over the timestamp */}
+        <div className="flex items-center justify-end gap-2">
+          <span>Date</span>
+          <div className="w-7"></div> {/* Invisible placeholder for the trash button */}
+        </div>
       </div>
+
       <ul className="divide-y divide-border/50">
         {rows.map((row) => {
           const imputedCount = row.imputed_fields?.length ?? 0
           return (
             <li
               key={row.id}
-              className="group grid grid-cols-1 gap-3 px-5 py-4 transition-all duration-300 hover:bg-primary/5 hover:backdrop-blur-sm md:grid-cols-[1.2fr_1.5fr_0.8fr_0.8fr_0.8fr_0.6fr_auto] md:items-center md:gap-4"
+              className="group grid grid-cols-1 gap-3 px-5 py-4 transition-all duration-300 hover:bg-primary/5 hover:backdrop-blur-sm md:grid-cols-[1.2fr_1.5fr_0.8fr_0.8fr_0.8fr_0.6fr_1.2fr] md:items-center md:gap-4"
             >
               <div>
                 <div className="font-serif text-lg font-semibold group-hover:text-primary transition-colors">
@@ -173,10 +179,12 @@ export function PredictionsList({
                 <span className="text-xs text-muted-foreground font-mono">
                   {formatDate(row.created_at)}
                 </span>
+                
+                {/* Mobile Visibility Fix: opacity-100 on mobile, fades on hover for desktop */}
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="h-7 w-7 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
                   onClick={() => onDelete(row.id)}
                   disabled={deletingId === row.id}
                   aria-label="Delete prediction"
@@ -191,4 +199,3 @@ export function PredictionsList({
     </div>
   )
 }
-
