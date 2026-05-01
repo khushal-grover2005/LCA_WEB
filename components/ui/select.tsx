@@ -42,7 +42,8 @@ const SelectContent = React.forwardRef<
     <SelectPrimitive.Content
       ref={ref}
       className={cn(
-        "relative z-50 max-h-72 min-w-[10rem] overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-xl",
+        // ✨ THE FIX: Changed z-50 to z-[150] right here!
+        "relative z-[150] max-h-72 min-w-[10rem] overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-xl",
         "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
         position === "popper" &&
           "data-[side=bottom]:translate-y-1 data-[side=top]:-translate-y-1",
