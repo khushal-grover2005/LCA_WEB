@@ -30,6 +30,10 @@ export function SignUpForm() {
         provider: "google",
         options: {
           redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
+          // FIX ADDED HERE: Forces the Google account picker
+          queryParams: {
+            prompt: 'select_account',
+          },
         },
       })
       if (error) throw error
@@ -148,4 +152,3 @@ export function SignUpForm() {
     </div>
   )
 }
-
