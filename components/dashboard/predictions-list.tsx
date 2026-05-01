@@ -3,9 +3,9 @@
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { Trash2, Sparkles, Flame, Recycle } from "lucide-react"
+import { Trash2, Sparkles, Flame, Recycle, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { Switch } from "@/components/ui/switch"
 import { toast } from "sonner"
 
 type Row = {
@@ -19,6 +19,8 @@ type Row = {
   reuse_potential: number | null
   imputed_fields: string[] | null
   created_at: string
+  // Added this to hold the profile data!
+  technical_profile?: Record<string, any> 
 }
 
 function formatNum(v: number | null, digits = 2) {
@@ -45,6 +47,13 @@ export function PredictionsList({
 }) {
   const router = useRouter()
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  
+  // State to track which rows have their technical profile expanded
+  const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({})
+
+  const toggleRow = (id: string) => {
+    setExpandedRows((prev) => ({ ...prev, [id]: !prev[id] }))
+  }
 
   async function onDelete(id: string) {
     setDeletingId(id)
@@ -110,28 +119,28 @@ export function PredictionsList({
         </div>
       </div>
 
-      {/* Header Row (Hidden on mobile, perfectly aligned via grid on desktop) */}
-      <div className="hidden grid-cols-[1.2fr_1.5fr_0.8fr_0.8fr_0.8fr_0.6fr_1.2fr] gap-4 border-b border-border bg-muted/10 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground md:grid md:items-center">
+      {/* Header Row */}
+      <div className="hidden grid-cols-[1.2fr_1.5fr_0.8fr_0.8fr_0.8fr_auto_1.2fr] gap-4 border-b border-border bg-muted/10 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground md:grid md:items-center">
         <div>Metal</div>
         <div>Route</div>
         <div className="text-right">GWP</div>
         <div className="text-right">Circularity</div>
         <div className="text-right">Recycled %</div>
-        <div>Imputed</div>
-        {/* Alignment Fix: Match the row's layout so "Date" sits perfectly over the timestamp */}
+        <div className="text-center w-16">Profile</div>
         <div className="flex items-center justify-end gap-2">
           <span>Date</span>
-          <div className="w-7"></div> {/* Invisible placeholder for the trash button */}
+          <div className="w-8"></div> {/* Spacer for alignment with trash button */}
         </div>
       </div>
 
       <ul className="divide-y divide-border/50">
         {rows.map((row) => {
-          const imputedCount = row.imputed_fields?.length ?? 0
+          const isExpanded = !!expandedRows[row.id]
+
           return (
             <li
               key={row.id}
-              className="group grid grid-cols-1 gap-3 px-5 py-4 transition-all duration-300 hover:bg-primary/5 hover:backdrop-blur-sm md:grid-cols-[1.2fr_1.5fr_0.8fr_0.8fr_0.8fr_0.6fr_1.2fr] md:items-center md:gap-4"
+              className="group grid grid-cols-1 gap-3 px-5 py-4 transition-all duration-300 hover:bg-primary/5 md:grid-cols-[1.2fr_1.5fr_0.8fr_0.8fr_0.8fr_auto_1.2fr] md:items-center md:gap-4"
             >
               <div>
                 <div className="font-serif text-lg font-semibold group-hover:text-primary transition-colors">
@@ -166,32 +175,64 @@ export function PredictionsList({
                   </span>
                 </div>
               </div>
-              <div>
-                {imputedCount > 0 ? (
-                  <Badge variant="outline" className="border-accent/30 bg-accent/5 text-[10px] text-accent">
-                    {imputedCount} EST
-                  </Badge>
-                ) : (
-                  <span className="text-xs text-muted-foreground font-mono">—</span>
-                )}
+
+              {/* Profile Toggle Switch */}
+              <div className="flex items-center justify-between md:justify-center mt-2 md:mt-0 w-full md:w-16">
+                <span className="text-xs text-muted-foreground md:hidden uppercase font-semibold">Full Profile</span>
+                <Switch 
+                  checked={isExpanded} 
+                  onCheckedChange={() => toggleRow(row.id)} 
+                  aria-label="Toggle full technical profile"
+                />
               </div>
-              <div className="flex items-center justify-between gap-2 md:justify-end">
+
+              {/* Date and Delete Button */}
+              <div className="flex items-center justify-between gap-2 md:justify-end mt-4 md:mt-0">
                 <span className="text-xs text-muted-foreground font-mono">
                   {formatDate(row.created_at)}
                 </span>
-                
-                {/* Mobile Visibility Fix: opacity-100 on mobile, fades on hover for desktop */}
+                {/* ✨ FIX: Removed hover/opacity classes. It is now always visible! */}
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-7 w-7 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
+                  className="h-8 w-8 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                   onClick={() => onDelete(row.id)}
                   disabled={deletingId === row.id}
                   aria-label="Delete prediction"
                 >
-                  <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                  <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
+
+              {/* Expandable Technical Profile Section */}
+              {isExpanded && (
+                <div className="col-span-1 md:col-span-7 mt-4 rounded-xl bg-background/50 p-5 border border-border shadow-inner animate-in fade-in slide-in-from-top-2">
+                  <h4 className="flex items-center gap-2 text-sm font-semibold text-foreground mb-4">
+                    <FileText className="h-4 w-4 text-primary" />
+                    Full Technical Profile
+                  </h4>
+                  
+                  {row.technical_profile && Object.keys(row.technical_profile).length > 0 ? (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                      {Object.entries(row.technical_profile).map(([key, val]) => (
+                        <div key={key} className="flex flex-col gap-1 border-l-2 border-primary/20 pl-3">
+                          <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                            {key.replace(/_/g, ' ')}
+                          </span>
+                          <span className="font-mono text-sm text-foreground">
+                            {typeof val === 'number' ? formatNum(val, 2) : String(val)}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground italic">
+                      No detailed technical profile data saved for this prediction.
+                    </p>
+                  )}
+                </div>
+              )}
+
             </li>
           )
         })}
