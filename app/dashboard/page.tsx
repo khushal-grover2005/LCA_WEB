@@ -22,7 +22,8 @@ export default async function DashboardPage() {
   const { data: predictions, error } = await supabase
     .from("predictions")
     .select(
-      "id, metal, production_route, gwp_total, circularity_index, resource_efficiency, recycled_content_est, reuse_potential, imputed_fields, created_at",
+      // ✨ FIX: Added 'technical_profile' to the end of this list!
+      "id, metal, production_route, gwp_total, circularity_index, resource_efficiency, recycled_content_est, reuse_potential, imputed_fields, created_at, technical_profile",
     )
     .order("created_at", { ascending: false })
     .limit(50)
