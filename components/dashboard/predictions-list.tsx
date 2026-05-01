@@ -19,7 +19,6 @@ type Row = {
   reuse_potential: number | null
   imputed_fields: string[] | null
   created_at: string
-  // Added this to hold the profile data!
   technical_profile?: Record<string, any> 
 }
 
@@ -48,7 +47,6 @@ export function PredictionsList({
   const router = useRouter()
   const [deletingId, setDeletingId] = useState<string | null>(null)
   
-  // State to track which rows have their technical profile expanded
   const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({})
 
   const toggleRow = (id: string) => {
@@ -119,7 +117,7 @@ export function PredictionsList({
         </div>
       </div>
 
-      {/* Header Row */}
+      {/* Header Row (Desktop Only) */}
       <div className="hidden grid-cols-[1.2fr_1.5fr_0.8fr_0.8fr_0.8fr_auto_1.2fr] gap-4 border-b border-border bg-muted/10 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground md:grid md:items-center">
         <div>Metal</div>
         <div>Route</div>
@@ -129,7 +127,7 @@ export function PredictionsList({
         <div className="text-center w-16">Profile</div>
         <div className="flex items-center justify-end gap-2">
           <span>Date</span>
-          <div className="w-8"></div> {/* Spacer for alignment with trash button */}
+          <div className="w-8"></div>
         </div>
       </div>
 
@@ -142,43 +140,65 @@ export function PredictionsList({
               key={row.id}
               className="group grid grid-cols-1 gap-3 px-5 py-4 transition-all duration-300 hover:bg-primary/5 md:grid-cols-[1.2fr_1.5fr_0.8fr_0.8fr_0.8fr_auto_1.2fr] md:items-center md:gap-4"
             >
+              {/* Metal & Route Info */}
               <div>
                 <div className="font-serif text-lg font-semibold group-hover:text-primary transition-colors">
                   {row.metal}
                 </div>
-                <div className="text-xs text-muted-foreground md:hidden font-mono">
+                <div className="text-xs text-muted-foreground md:hidden font-mono mt-0.5">
                   {row.production_route}
                 </div>
               </div>
+              
               <div className="hidden text-sm text-muted-foreground md:block font-mono">
                 {row.production_route}
               </div>
-              <div className="flex items-center gap-4 md:contents">
-                <div className="flex items-center gap-1.5 md:block md:text-right">
-                  <Flame className="h-3.5 w-3.5 text-primary md:hidden" />
-                  <span className="font-mono text-sm tabular-nums">
-                    {formatNum(row.gwp_total, 2)}
+
+              {/* ✨ RESPONSIVE FIX: Mini-grid for mobile stats, disappears into the main grid on desktop ✨ */}
+              <div className="grid grid-cols-3 gap-2 mt-3 mb-2 w-full md:contents md:m-0 md:w-auto">
+                
+                {/* GWP */}
+                <div className="flex flex-col gap-1 md:block md:text-right">
+                  <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground md:hidden">
+                    <Flame className="h-3 w-3 text-primary" />
+                    GWP
                   </span>
-                  <span className="text-[10px] text-muted-foreground md:block">
-                    kg CO₂/kg
-                  </span>
+                  <div className="flex items-baseline gap-1 md:block">
+                    <span className="font-mono text-sm tabular-nums text-foreground">
+                      {formatNum(row.gwp_total, 2)}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground md:block">
+                      kg CO₂/kg
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1.5 md:block md:text-right">
-                  <Recycle className="h-3.5 w-3.5 text-accent md:hidden" />
-                  <span className="font-mono text-sm tabular-nums text-accent font-semibold">
+
+                {/* Circularity */}
+                <div className="flex flex-col gap-1 md:block md:text-right">
+                  <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground md:hidden">
+                    <Recycle className="h-3 w-3 text-emerald-400" />
+                    Circularity
+                  </span>
+                  <span className="font-mono text-sm tabular-nums text-emerald-400 font-semibold">
                     {formatNum(row.circularity_index, 2)}
                   </span>
                 </div>
-                <div className="md:text-right">
+
+                {/* Recycled % */}
+                <div className="flex flex-col gap-1 md:block md:text-right">
+                  <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground md:hidden">
+                    Recycled %
+                  </span>
                   <span className="font-mono text-sm tabular-nums">
                     {formatNum(row.recycled_content_est, 1)}%
                   </span>
                 </div>
+
               </div>
 
               {/* Profile Toggle Switch */}
-              <div className="flex items-center justify-between md:justify-center mt-2 md:mt-0 w-full md:w-16">
-                <span className="text-xs text-muted-foreground md:hidden uppercase font-semibold">Full Profile</span>
+              <div className="flex items-center justify-between md:justify-center mt-2 md:mt-0 w-full md:w-16 bg-muted/30 md:bg-transparent px-3 py-2 md:p-0 rounded-lg md:rounded-none">
+                <span className="text-xs text-foreground md:hidden uppercase font-semibold tracking-wider">Full Profile</span>
                 <Switch 
                   checked={isExpanded} 
                   onCheckedChange={() => toggleRow(row.id)} 
@@ -187,11 +207,10 @@ export function PredictionsList({
               </div>
 
               {/* Date and Delete Button */}
-              <div className="flex items-center justify-between gap-2 md:justify-end mt-4 md:mt-0">
+              <div className="flex items-center justify-between gap-2 md:justify-end mt-2 md:mt-0">
                 <span className="text-xs text-muted-foreground font-mono">
                   {formatDate(row.created_at)}
                 </span>
-                {/* ✨ FIX: Removed hover/opacity classes. It is now always visible! */}
                 <Button
                   variant="ghost"
                   size="icon"
@@ -219,7 +238,7 @@ export function PredictionsList({
                           <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
                             {key.replace(/_/g, ' ')}
                           </span>
-                          <span className="font-mono text-sm text-foreground">
+                          <span className="font-mono text-sm text-foreground break-words">
                             {typeof val === 'number' ? formatNum(val, 2) : String(val)}
                           </span>
                         </div>
