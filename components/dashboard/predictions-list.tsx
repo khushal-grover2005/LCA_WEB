@@ -140,28 +140,35 @@ export function PredictionsList({
               key={row.id}
               className="group grid grid-cols-1 gap-3 px-5 py-4 transition-all duration-300 hover:bg-primary/5 md:grid-cols-[1.2fr_1.5fr_0.8fr_0.8fr_0.8fr_auto_1.2fr] md:items-center md:gap-4"
             >
-              {/* Metal & Route Info */}
-              <div>
+              {/* ✨ FIX: Added Mobile-Only Route Header ✨ */}
+              <div className="flex flex-col md:block">
                 <div className="font-serif text-lg font-semibold group-hover:text-primary transition-colors">
                   {row.metal}
                 </div>
-                <div className="text-xs text-muted-foreground md:hidden font-mono mt-0.5">
-                  {row.production_route}
+                {/* This block only shows on mobile devices */}
+                <div className="md:hidden mt-2 flex flex-col gap-0.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Route
+                  </span>
+                  <div className="text-xs text-muted-foreground font-mono">
+                    {row.production_route}
+                  </div>
                 </div>
               </div>
               
+              {/* This block only shows on desktop devices */}
               <div className="hidden text-sm text-muted-foreground md:block font-mono">
                 {row.production_route}
               </div>
 
-              {/* ✨ RESPONSIVE FIX: Mini-grid for mobile stats, disappears into the main grid on desktop ✨ */}
-              <div className="grid grid-cols-3 gap-2 mt-3 mb-2 w-full md:contents md:m-0 md:w-auto">
+              {/* Proportional grid for numerical stats */}
+              <div className="grid grid-cols-[1.2fr_1fr_0.9fr] gap-x-4 sm:gap-x-6 gap-y-3 mt-4 mb-3 w-full md:contents md:m-0 md:w-auto">
                 
                 {/* GWP */}
                 <div className="flex flex-col gap-1 md:block md:text-right">
                   <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground md:hidden">
-                    <Flame className="h-3 w-3 text-primary" />
-                    GWP
+                    <Flame className="h-3 w-3 text-primary shrink-0" />
+                    <span className="truncate">GWP</span>
                   </span>
                   <div className="flex items-baseline gap-1 md:block">
                     <span className="font-mono text-sm tabular-nums text-foreground">
@@ -176,8 +183,8 @@ export function PredictionsList({
                 {/* Circularity */}
                 <div className="flex flex-col gap-1 md:block md:text-right">
                   <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground md:hidden">
-                    <Recycle className="h-3 w-3 text-emerald-400" />
-                    Circularity
+                    <Recycle className="h-3 w-3 text-emerald-400 shrink-0" />
+                    <span className="truncate">Circularity</span>
                   </span>
                   <span className="font-mono text-sm tabular-nums text-emerald-400 font-semibold">
                     {formatNum(row.circularity_index, 2)}
@@ -187,7 +194,7 @@ export function PredictionsList({
                 {/* Recycled % */}
                 <div className="flex flex-col gap-1 md:block md:text-right">
                   <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground md:hidden">
-                    Recycled %
+                    <span className="truncate">Recycled %</span>
                   </span>
                   <span className="font-mono text-sm tabular-nums">
                     {formatNum(row.recycled_content_est, 1)}%
@@ -197,7 +204,7 @@ export function PredictionsList({
               </div>
 
               {/* Profile Toggle Switch */}
-              <div className="flex items-center justify-between md:justify-center mt-2 md:mt-0 w-full md:w-16 bg-muted/30 md:bg-transparent px-3 py-2 md:p-0 rounded-lg md:rounded-none">
+              <div className="flex items-center justify-between md:justify-center mt-2 md:mt-0 w-full md:w-16 bg-muted/30 md:bg-transparent px-4 py-2 md:p-0 rounded-lg md:rounded-none">
                 <span className="text-xs text-foreground md:hidden uppercase font-semibold tracking-wider">Full Profile</span>
                 <Switch 
                   checked={isExpanded} 
@@ -207,7 +214,7 @@ export function PredictionsList({
               </div>
 
               {/* Date and Delete Button */}
-              <div className="flex items-center justify-between gap-2 md:justify-end mt-2 md:mt-0">
+              <div className="flex items-center justify-between gap-2 md:justify-end mt-3 md:mt-0">
                 <span className="text-xs text-muted-foreground font-mono">
                   {formatDate(row.created_at)}
                 </span>
