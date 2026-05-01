@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
@@ -19,6 +19,24 @@ export function LoginForm() {
   const [googleLoading, setGoogleLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // ✨ NEW EFFECT: Reset loading states when returning via back button
+  useEffect(() => {
+    const handlePageShow = (event: PageTransitionEvent) => {
+      // If the page was restored from the bfcache (Back-Forward Cache)
+      if (event.persisted) {
+        setGoogleLoading(false)
+        setLoading(false)
+      } else {
+        // Fallback for some browsers that don't correctly report persisted
+        setGoogleLoading(false)
+        setLoading(false)
+      }
+    }
+
+    window.addEventListener("pageshow", handlePageShow)
+    return () => window.removeEventListener("pageshow", handlePageShow)
+  }, [])
+
   async function onGoogleSignIn() {
     setGoogleLoading(true)
     setError(null)
@@ -31,7 +49,7 @@ export function LoginForm() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/auth/callback?next=${redirect}`,
+          redirectTo: `${origin}/auth/callback?next=${redirect}`,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent select_account',
@@ -56,9 +74,8 @@ export function LoginForm() {
       router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : "Sign-in failed.")
-    } finally {
-      setLoading(false)
-    }
+      setLoading(false) // Added this to reset loading if regular sign-in fails
+    } 
   }
 
   return (
@@ -139,4 +156,3 @@ export function LoginForm() {
     </div>
   )
 }
-

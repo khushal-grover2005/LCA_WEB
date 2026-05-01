@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
@@ -21,6 +21,24 @@ export function SignUpForm() {
   const match = password === confirm
   const canSubmit = !!email && pwValid && match
 
+  // ✨ NEW EFFECT: Reset loading states when returning via back button
+  useEffect(() => {
+    const handlePageShow = (event: PageTransitionEvent) => {
+      // If the page was restored from the bfcache (Back-Forward Cache)
+      if (event.persisted) {
+        setGoogleLoading(false)
+        setLoading(false)
+      } else {
+        // Fallback for some browsers
+        setGoogleLoading(false)
+        setLoading(false)
+      }
+    }
+
+    window.addEventListener("pageshow", handlePageShow)
+    return () => window.removeEventListener("pageshow", handlePageShow)
+  }, [])
+
   async function onGoogleSignIn() {
     setGoogleLoading(true)
     setError(null)
@@ -30,7 +48,6 @@ export function SignUpForm() {
         provider: "google",
         options: {
           redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
-          // FIX ADDED HERE: Forces the Google account picker
           queryParams: {
             prompt: 'select_account',
           },
@@ -54,9 +71,8 @@ export function SignUpForm() {
       router.push("/auth/sign-up-success")
     } catch (err) {
       setError(err instanceof Error ? err.message : "Sign-up failed.")
-    } finally {
-      setLoading(false)
-    }
+      setLoading(false) // Added this to reset loading if normal signup fails
+    } 
   }
 
   return (
