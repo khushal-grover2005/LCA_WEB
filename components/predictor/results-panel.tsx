@@ -86,7 +86,6 @@ export function ResultsPanel({ response, inputPayload, authenticated }: Props) {
     }
   }
 
-  // ✨ FIX: Expanded the tone type to include our vibrant colors
   const headline: {
     key: string
     label: string
@@ -142,8 +141,6 @@ export function ResultsPanel({ response, inputPayload, authenticated }: Props) {
           {headline.map((h, i) => {
             const Icon = h.icon
             const value = results[h.key as keyof typeof results]
-            
-            // ✨ FIX: Check if this is the 5th item
             const isLastOddItem = i === 4;
 
             return (
@@ -156,10 +153,6 @@ export function ResultsPanel({ response, inputPayload, authenticated }: Props) {
                   h.tone === "cyan" && "border-cyan-500/30 bg-cyan-500/5",
                   h.tone === "violet" && "border-violet-500/30 bg-violet-500/5",
                   h.tone === "amber" && "border-amber-500/30 bg-amber-500/5",
-                  
-                  // ✨ FIX: Responsive centering logic
-                  // Spans 2 cols on mobile, sets width to 50% minus the gap (0.375rem), and centers.
-                  // Reverts to normal 1-col behavior on md+ screens.
                   isLastOddItem && "col-span-2 w-[calc(50%-0.375rem)] mx-auto md:col-span-1 md:w-auto"
                 )}
               >
@@ -264,13 +257,28 @@ export function ResultsPanel({ response, inputPayload, authenticated }: Props) {
                         rawInput !== undefined && rawInput !== ""
                           ? rawInput
                           : profileValue
+                      
+                      // Check if the field is a Year to avoid formatting with commas
+                      const isYearField = f.key.toLowerCase().includes("year")
+                      
+                      // Determine exactly how to format the string based on type
+                      const displayStr = 
+                        display === undefined || display === null || display === ""
+                          ? "—"
+                          : isYearField
+                          ? String(display)
+                          : typeof display === "number"
+                          ? formatNum(display, 2)
+                          : String(display)
+
                       return (
                         <div
                           key={f.key}
-                          className="flex items-center justify-between px-5 py-2.5 text-sm"
+                          // ✨ LAYOUT FIX: Changed to flex-col on mobile, flex-row on desktop with wrap support
+                          className="flex flex-col sm:flex-row sm:items-start justify-between gap-1.5 sm:gap-4 px-5 py-3 text-sm"
                         >
-                          <div className="flex items-center gap-2">
-                            <span className="text-foreground/90">{f.label}</span>
+                          <div className="flex flex-wrap items-center gap-2 shrink-0 sm:max-w-[45%] sm:pt-[1px]">
+                            <span className="text-foreground/90 font-medium">{f.label}</span>
                             {f.unit && (
                               <span className="text-xs text-muted-foreground">
                                 ({f.unit})
@@ -295,12 +303,9 @@ export function ResultsPanel({ response, inputPayload, authenticated }: Props) {
                                 </Badge>
                               )}
                           </div>
-                          <span className="font-mono text-sm tabular-nums text-foreground">
-                            {display === undefined || display === null || display === ""
-                              ? "—"
-                              : typeof display === "number"
-                              ? formatNum(display, 2)
-                              : String(display)}
+                          
+                          <span className="font-mono text-sm tabular-nums text-foreground text-left sm:text-right break-words flex-1">
+                            {displayStr}
                           </span>
                         </div>
                       )
