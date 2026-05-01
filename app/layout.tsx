@@ -20,7 +20,7 @@ const jetbrains = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Orecast — LCA Predictor for Metals",
+  title: "MetalCycle — LCA Predictor for Metals",
   description:
     "Predict the environmental footprint and circularity of 20 metals across 68 production routes. AI-augmented Life Cycle Assessment with imputation, sankey flows, and dashboards.",
   generator: "v0.app",
