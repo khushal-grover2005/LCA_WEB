@@ -24,6 +24,15 @@ export const metadata: Metadata = {
   description:
     "Predict the environmental footprint and circularity of 20 metals across 68 production routes. AI-augmented Life Cycle Assessment with imputation, sankey flows, and dashboards.",
   generator: "v0.app",
+  icons: {
+    icon: [
+      {
+        url: "/icon.png", // Pointing to the file in your /public folder
+        href: "/icon.png",
+      },
+    ],
+    apple: "/icon.png",
+  },
 }
 
 export const viewport: Viewport = {
