@@ -86,19 +86,20 @@ export function ResultsPanel({ response, inputPayload, authenticated }: Props) {
     }
   }
 
+  // ✨ FIX: Expanded the tone type to include our vibrant colors
   const headline: {
     key: string
     label: string
     icon: typeof Flame
     unit?: string
     digits?: number
-    tone?: "primary" | "accent" | "default"
+    tone?: "primary" | "accent" | "cyan" | "violet" | "amber" | "default"
   }[] = [
     { key: "gwp_total", label: "Total GWP", icon: Flame, unit: "kg CO₂/kg", tone: "primary" },
     { key: "circularity_index", label: "Circularity", icon: Recycle, digits: 2, tone: "accent" },
-    { key: "resource_efficiency", label: "Resource Eff.", icon: Gauge, digits: 2 },
-    { key: "recycled_content_est", label: "Recycled %", icon: TrendingUp, unit: "%", digits: 1 },
-    { key: "reuse_potential", label: "Reuse Score", icon: Sparkles, digits: 2 },
+    { key: "resource_efficiency", label: "Resource Eff.", icon: Gauge, digits: 2, tone: "cyan" },
+    { key: "recycled_content_est", label: "Recycled %", icon: TrendingUp, unit: "%", digits: 1, tone: "violet" },
+    { key: "reuse_potential", label: "Reuse Score", icon: Sparkles, digits: 2, tone: "amber" },
   ]
 
   return (
@@ -138,36 +139,55 @@ export function ResultsPanel({ response, inputPayload, authenticated }: Props) {
           )}
         </div>
         <div className="grid grid-cols-2 gap-3 p-5 md:grid-cols-5">
-          {headline.map((h) => {
+          {headline.map((h, i) => {
             const Icon = h.icon
             const value = results[h.key as keyof typeof results]
+            
+            // ✨ FIX: Check if this is the 5th item
+            const isLastOddItem = i === 4;
+
             return (
               <div
                 key={h.key}
                 className={cn(
-                  "metric-chip rounded-lg border border-border bg-background/60 p-4",
+                  "metric-chip flex flex-col justify-between rounded-lg border border-border bg-background/60 p-4",
                   h.tone === "primary" && "border-primary/30 bg-primary/5",
                   h.tone === "accent" && "border-accent/30 bg-accent/5",
+                  h.tone === "cyan" && "border-cyan-500/30 bg-cyan-500/5",
+                  h.tone === "violet" && "border-violet-500/30 bg-violet-500/5",
+                  h.tone === "amber" && "border-amber-500/30 bg-amber-500/5",
+                  
+                  // ✨ FIX: Responsive centering logic
+                  // Spans 2 cols on mobile, sets width to 50% minus the gap (0.375rem), and centers.
+                  // Reverts to normal 1-col behavior on md+ screens.
+                  isLastOddItem && "col-span-2 w-[calc(50%-0.375rem)] mx-auto md:col-span-1 md:w-auto"
                 )}
               >
-                <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground">
+                <div className="flex items-center gap-2 text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">
                   <Icon
                     className={cn(
                       "h-3.5 w-3.5",
                       h.tone === "primary" && "text-primary",
                       h.tone === "accent" && "text-accent",
+                      h.tone === "cyan" && "text-cyan-400",
+                      h.tone === "violet" && "text-violet-400",
+                      h.tone === "amber" && "text-amber-400",
                     )}
                   />
                   {h.label}
                 </div>
-                <div className="mt-2 font-serif text-2xl font-semibold">
+                <div className="mt-3 font-serif text-3xl font-semibold">
                   {formatNum(value, h.digits ?? 2)}
                 </div>
-                {h.unit && (
-                  <div className="text-[10px] text-muted-foreground">
-                    {h.unit}
-                  </div>
-                )}
+                <div className="mt-auto pt-1 min-h-[1.25rem] flex items-end">
+                  {h.unit ? (
+                    <div className="text-[10px] text-muted-foreground/70 font-medium">
+                      {h.unit}
+                    </div>
+                  ) : (
+                    <div className="h-px w-full" aria-hidden="true" />
+                  )}
+                </div>
               </div>
             )
           })}
