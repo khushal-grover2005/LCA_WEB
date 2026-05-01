@@ -23,7 +23,6 @@ export function SiteNav() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  // 1. Fetch user session
   useEffect(() => {
     const supabase = createClient()
     supabase.auth.getUser().then(({ data }) => {
@@ -35,7 +34,6 @@ export function SiteNav() {
     return () => sub.subscription.unsubscribe()
   }, [])
 
-  // 2. Handle header background on scroll
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12)
     onScroll()
@@ -43,12 +41,10 @@ export function SiteNav() {
     return () => window.removeEventListener("scroll", onScroll)
   }, [])
 
-  // 3. Close mobile menu when navigating to a new page
   useEffect(() => {
     setMobileMenuOpen(false)
   }, [pathname])
 
-  // 4. Lock background scrolling ONLY when menu is open
   useEffect(() => {
     if (mobileMenuOpen) {
       document.body.style.overflow = "hidden"
@@ -143,9 +139,11 @@ export function SiteNav() {
 
         {/* MOBILE OVERLAY */}
         {mobileMenuOpen && (
-          <div className="fixed inset-0 top-16 z-[105] h-[calc(100vh-64px)] w-full bg-background lg:hidden animate-in fade-in slide-in-from-top-4 duration-200 overflow-y-auto">
-            {/* Added min-h-full and pb-12 so it scrolls properly in landscape */}
-            <nav className="flex flex-col p-6 gap-4 min-h-full pb-12">
+          // ✨ FIX: Swapped 100vh for 100dvh so it dynamically accounts for the Safari URL bar
+          <div className="fixed inset-0 top-16 z-[105] h-[calc(100dvh-64px)] w-full bg-background lg:hidden animate-in fade-in slide-in-from-top-4 duration-200 overflow-y-auto">
+            
+            {/* ✨ FIX: Increased pb-12 to pb-32 to guarantee scroll clearance over the browser UI */}
+            <nav className="flex flex-col p-6 gap-4 min-h-full pb-32">
               {LINKS.map((link) => (
                 <Link
                   key={link.href}
@@ -165,19 +163,19 @@ export function SiteNav() {
                 <hr className="border-border/50" />
                 {!email ? (
                   <div className="grid grid-cols-1 gap-3">
-                    <Button asChild variant="outline" size="lg" className="h-12 text-base">
+                    <Button asChild variant="outline" size="lg" className="h-12 text-base shrink-0">
                       <Link href="/auth/login">Sign in</Link>
                     </Button>
-                    <Button asChild size="lg" className="h-12 text-base font-bold">
+                    <Button asChild size="lg" className="h-12 text-base font-bold shrink-0">
                       <Link href="/auth/sign-up">Join MetalCycle</Link>
                     </Button>
                   </div>
                 ) : (
-                  <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-3 shrink-0">
                     <div className="text-sm text-muted-foreground text-center italic mb-2">
                       Logged in as {email}
                     </div>
-                    <Button variant="destructive" size="lg" onClick={signOut} className="w-full h-12 text-base gap-2">
+                    <Button variant="destructive" size="lg" onClick={signOut} className="w-full h-12 text-base gap-2 shrink-0">
                       <LogOut className="h-5 w-5" />
                       Sign Out
                     </Button>
