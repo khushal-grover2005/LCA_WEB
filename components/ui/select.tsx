@@ -41,9 +41,9 @@ const SelectContent = React.forwardRef<
   <SelectPrimitive.Portal>
     <SelectPrimitive.Content
       ref={ref}
+      collisionPadding={24}
       className={cn(
-        // ✨ THE FIX: Changed z-50 to z-[150] right here!
-        "relative z-[150] max-h-72 min-w-[10rem] overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-xl",
+        "relative z-[150] max-h-96 min-w-[10rem] overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-xl",
         "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
         position === "popper" &&
           "data-[side=bottom]:translate-y-1 data-[side=top]:-translate-y-1",
@@ -52,9 +52,10 @@ const SelectContent = React.forwardRef<
       position={position}
       {...props}
     >
-      <SelectPrimitive.ScrollUpButton className="flex h-6 cursor-default items-center justify-center">
+      <SelectPrimitive.ScrollUpButton className="flex h-6 cursor-default items-center justify-center bg-popover/80 backdrop-blur-sm z-10 relative">
         <ChevronUp className="h-4 w-4" />
       </SelectPrimitive.ScrollUpButton>
+      
       <SelectPrimitive.Viewport
         className={cn(
           "p-1",
@@ -63,7 +64,8 @@ const SelectContent = React.forwardRef<
       >
         {children}
       </SelectPrimitive.Viewport>
-      <SelectPrimitive.ScrollDownButton className="flex h-6 cursor-default items-center justify-center">
+      
+      <SelectPrimitive.ScrollDownButton className="flex h-6 cursor-default items-center justify-center bg-popover/80 backdrop-blur-sm z-10 relative">
         <ChevronDown className="h-4 w-4" />
       </SelectPrimitive.ScrollDownButton>
     </SelectPrimitive.Content>
