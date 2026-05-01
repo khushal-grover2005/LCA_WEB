@@ -1,48 +1,64 @@
 "use client"
 
-import { Chart } from "react-google-charts"
-import { GlowingCard } from "@/components/ui/glowing-card"
+import { useEffect, useRef } from "react"
+import { ResponsiveSankey } from "@nivo/sankey"
+import { gsap } from "gsap"
 
 export function SankeyChart({ data }: { data: any }) {
-  // Transform standard node/link data into Google Charts format
-  const chartData = [
-    ["From", "To", "Weight"],
-    ...data.links.map((link: any) => [
-      data.nodes[link.source].name,
-      data.nodes[link.target].name,
-      link.value,
-    ]),
-  ]
+  const containerRef = useRef<HTMLDivElement>(null)
 
-  const options = {
-    sankey: {
-      node: {
-        colors: ["#EA7834", "#50C878", "#94A3B8", "#1E293B"], // Copper, Emerald, Slate
-        nodePadding: 30,
-        label: { fontName: "Inter", fontSize: 12, color: "#94A3B8" },
-      },
-      link: {
-        colorMode: "gradient",
-        colors: ["rgba(234, 120, 52, 0.3)"],
-      },
-    },
-    backgroundColor: "transparent",
-    height: 350,
-  }
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Custom Path Morphing Effect: Animating stroke-dash for "flow" look
+      gsap.fromTo("path", 
+        { strokeDasharray: "10,10", strokeDashoffset: 100, opacity: 0 },
+        { 
+          strokeDashoffset: 0, 
+          opacity: 0.6, 
+          duration: 3, 
+          stagger: 0.05, 
+          ease: "none",
+          repeat: -1
+        }
+      )
+      
+      // Node entrance
+      gsap.from("rect", {
+        scaleY: 0,
+        transformOrigin: "bottom",
+        duration: 1,
+        stagger: 0.02,
+        ease: "expo.out"
+      })
+    }, containerRef)
+
+    return () => ctx.revert()
+  }, [data])
 
   return (
-    <GlowingCard className="h-full w-full">
-      <h3 className="mb-4 font-serif text-lg font-semibold text-foreground">
-        Material Flow Topology
-      </h3>
-      <Chart
-        chartType="Sankey"
-        width="100%"
-        height="350px"
-        data={chartData}
-        options={options}
+    <div ref={containerRef} className="h-full w-full">
+      <ResponsiveSankey
+        data={data}
+        margin={{ top: 10, right: 160, bottom: 10, left: 10 }}
+        align="justify"
+        colors={{ scheme: 'category10' }}
+        nodeThickness={16}
+        nodeSpacing={24}
+        nodeBorderWidth={0}
+        nodeBorderRadius={4}
+        enableLinkGradient={true}
+        linkOpacity={0.3}
+        linkHoverOpacity={0.8}
+        linkHoverOthersOpacity={0.05}
+        labelPosition="outside"
+        labelOrientation="horizontal"
+        labelPadding={20}
+        labelTextColor="hsl(var(--muted-foreground))"
+        theme={{
+          labels: { text: { fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' } },
+          tooltip: { container: { background: 'hsl(var(--popover))', color: 'hsl(var(--popover-foreground))', borderRadius: '12px', border: '1px solid hsl(var(--border))', boxShadow: '0 20px 40px rgba(0,0,0,0.4)' } }
+        }}
       />
-    </GlowingCard>
+    </div>
   )
 }
-
