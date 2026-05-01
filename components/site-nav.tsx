@@ -48,14 +48,13 @@ export function SiteNav() {
     setMobileMenuOpen(false)
   }, [pathname])
 
-  // 4. Lock background scrolling ONLY when menu is open (Fixed Infinite Loop)
+  // 4. Lock background scrolling ONLY when menu is open
   useEffect(() => {
     if (mobileMenuOpen) {
       document.body.style.overflow = "hidden"
     } else {
       document.body.style.overflow = "unset"
     }
-    // Cleanup to ensure body scroll is restored if component unmounts
     return () => {
       document.body.style.overflow = "unset"
     }
@@ -88,7 +87,7 @@ export function SiteNav() {
           </span>
         </Link>
 
-        {/* DESKTOP NAV LINKS (Hidden on Mobile/Tablet) */}
+        {/* DESKTOP NAV LINKS */}
         <nav className="hidden lg:flex items-center gap-1">
           {LINKS.map((link) => {
             const active = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href)
@@ -111,7 +110,6 @@ export function SiteNav() {
 
         {/* TOP ACTIONS AREA */}
         <div className="flex items-center gap-2 z-[110]">
-          {/* DESKTOP ONLY: Log Out / Sign In / Join (Hidden on <1024px) */}
           {email ? (
             <div className="hidden lg:flex items-center gap-2">
               <span className="text-xs text-muted-foreground xl:inline">
@@ -132,7 +130,7 @@ export function SiteNav() {
             </div>
           )}
 
-          {/* MOBILE TOGGLE BUTTON (Visible only on <1024px) */}
+          {/* MOBILE TOGGLE BUTTON */}
           <Button
             variant="ghost"
             size="sm"
@@ -143,16 +141,17 @@ export function SiteNav() {
           </Button>
         </div>
 
-        {/* MOBILE OVERLAY (Fully opaque, contains all mobile actions) */}
+        {/* MOBILE OVERLAY */}
         {mobileMenuOpen && (
-          <div className="fixed inset-0 top-16 z-[105] h-[calc(100vh-64px)] w-full bg-background lg:hidden animate-in fade-in slide-in-from-top-4 duration-200">
-            <nav className="flex flex-col p-6 gap-4 h-full">
+          <div className="fixed inset-0 top-16 z-[105] h-[calc(100vh-64px)] w-full bg-background lg:hidden animate-in fade-in slide-in-from-top-4 duration-200 overflow-y-auto">
+            {/* Added min-h-full and pb-12 so it scrolls properly in landscape */}
+            <nav className="flex flex-col p-6 gap-4 min-h-full pb-12">
               {LINKS.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
                   className={cn(
-                    "flex items-center h-14 px-4 rounded-xl text-xl transition-all",
+                    "flex items-center h-14 px-4 rounded-xl text-xl transition-all shrink-0",
                     pathname === link.href 
                       ? "bg-primary/10 text-primary font-bold" 
                       : "text-muted-foreground active:bg-muted"
@@ -162,7 +161,7 @@ export function SiteNav() {
                 </Link>
               ))}
 
-              <div className="mt-auto pb-10 flex flex-col gap-4">
+              <div className="mt-auto pt-6 flex flex-col gap-4 shrink-0">
                 <hr className="border-border/50" />
                 {!email ? (
                   <div className="grid grid-cols-1 gap-3">
