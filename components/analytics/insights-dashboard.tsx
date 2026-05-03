@@ -8,18 +8,16 @@ import { GlowingCard } from "@/components/ui/glowing-card"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-// ✨ PRO FIX 1: By casting (mod: any), we bypass TS errors and safely catch ANY export style without crashing.
 const SankeyChart = dynamic(() => import("./sankey-chart").then((mod: any) => mod.SankeyChart || mod.default), { 
   ssr: false,
-  loading: () => <div className="h-full w-full flex items-center justify-center animate-pulse bg-muted/10 rounded-xl text-muted-foreground text-sm font-mono">Loading Flow...</div>
+  loading: () => <div className="h-[350px] w-full flex items-center justify-center animate-pulse bg-muted/10 rounded-xl text-muted-foreground text-sm font-mono">Loading Flow...</div>
 })
 
 const ValueRadar = dynamic(() => import("./value-radar").then((mod: any) => mod.ValueRadar || mod.default), { 
   ssr: false,
-  loading: () => <div className="h-full w-full flex items-center justify-center animate-pulse bg-muted/10 rounded-xl text-muted-foreground text-sm font-mono">Loading Radar...</div>
+  loading: () => <div className="h-[350px] w-full flex items-center justify-center animate-pulse bg-muted/10 rounded-xl text-muted-foreground text-sm font-mono">Loading Radar...</div>
 })
 
-// ✨ PRO FIX 2: A custom Error Boundary. If a chart crashes, it shows the error inline instead of a global black screen!
 class ChartErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean, error: Error | null}> {
   constructor(props: {children: React.ReactNode}) {
     super(props);
@@ -31,7 +29,7 @@ class ChartErrorBoundary extends React.Component<{children: React.ReactNode}, {h
   render() {
     if (this.state.hasError) {
       return (
-        <div className="flex flex-col items-center justify-center p-6 bg-destructive/10 text-destructive rounded-xl h-full border border-destructive/20 text-center">
+        <div className="flex flex-col items-center justify-center p-6 bg-destructive/10 text-destructive rounded-xl h-full min-h-[300px] border border-destructive/20 text-center">
           <AlertCircle className="h-8 w-8 mb-2" />
           <p className="font-bold text-sm">Chart Component Crashed</p>
           <code className="text-[10px] mt-2 p-2 bg-destructive/20 rounded max-w-full overflow-x-auto text-left">
@@ -54,6 +52,21 @@ const formatSafeDate = (isoString: string) => {
   }
 }
 
+// ✨ PRO FIX: A robust function to dig out the Sankey data no matter how Supabase nested it.
+const extractSankeyData = (prediction: any) => {
+  if (!prediction) return { nodes: [], links: [] };
+  
+  // It might be flat, it might be nested in visualizations, OR it might be nested inside a 'response' object
+  let rawViz = prediction.visualizations || prediction.response?.visualizations || prediction.sankey_data;
+  
+  // If Supabase saved it as a raw string, parse it
+  if (typeof rawViz === 'string') {
+    try { rawViz = JSON.parse(rawViz); } catch(e) {}
+  }
+  
+  return rawViz?.sankey_data || rawViz || { nodes: [], links: [] };
+}
+
 export function InsightsDashboard({ history }: { history: any[] }) {
   const [selectedId, setSelectedId] = useState(history?.[0]?.id || null)
   const [isAnalyzed, setIsAnalyzed] = useState(false)
@@ -67,23 +80,23 @@ export function InsightsDashboard({ history }: { history: any[] }) {
     const rawData = history.find(p => p?.id === selectedId);
     if (!rawData) return null;
 
-    // ✨ PRO FIX 3: Re-nesting the data. If the database flattened the results, 
-    // we rebuild the object so the charts don't crash when looking for `data.results.gwp_total`
+    // We check `rawData.response.results` in case you saved the entire API response inside a `response` column
     return {
       ...rawData,
-      results: rawData.results || {
+      results: rawData.results || rawData.response?.results || {
         gwp_total: rawData.gwp_total || 0,
         circularity_index: rawData.circularity_index || 0,
         resource_efficiency: rawData.resource_efficiency || 0,
         recycled_content_est: rawData.recycled_content_est || 0,
-      }
+      },
+      technical_profile: rawData.technical_profile || rawData.response?.technical_profile || {}
     }
   }, [selectedId, history])
 
   const maxValues = useMemo(() => {
     if (!Array.isArray(history) || history.length === 0) return { gwp: 1, circularity: 100, recycled: 100 };
     return {
-      gwp: Math.max(...history.map(p => Number(p?.gwp_total) || Number(p?.results?.gwp_total) || 1)),
+      gwp: Math.max(...history.map(p => Number(p?.gwp_total) || Number(p?.results?.gwp_total) || Number(p?.response?.results?.gwp_total) || 1)),
       circularity: 100,
       recycled: 100
     }
@@ -91,8 +104,6 @@ export function InsightsDashboard({ history }: { history: any[] }) {
 
   const handleAnalyze = () => {
     setIsAnalyzed(true)
-    
-    // Auto-scroll logic: waits a tiny bit for the grid to render, then scrolls to it
     setTimeout(() => {
       if (analysisRef.current) {
         analysisRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -131,7 +142,6 @@ export function InsightsDashboard({ history }: { history: any[] }) {
 
   return (
     <div ref={dashboardRef} className="space-y-8 pb-20">
-      {/* Selection Section */}
       <div className="selection-box flex flex-col md:flex-row justify-between items-end gap-6 bg-card/30 p-8 rounded-[2rem] border border-border/50 backdrop-blur-md">
         <div className="space-y-4 flex-1 w-full">
           <label className="text-[10px] font-black uppercase tracking-[0.2em] text-primary ml-1">Archive Explorer</label>
@@ -176,7 +186,7 @@ export function InsightsDashboard({ history }: { history: any[] }) {
         <div ref={analysisRef} className="analysis-grid grid grid-cols-1 lg:grid-cols-12 gap-8 scroll-mt-24 pt-4">
           
           {/* Radar Visualization */}
-          <div className="viz-card lg:col-span-4 h-[500px]">
+          <div className="viz-card lg:col-span-4 min-h-[500px]">
             <GlowingCard className="h-full p-8 flex flex-col relative overflow-hidden group">
               <div className="flex justify-between items-start mb-8">
                 <div>
@@ -185,7 +195,8 @@ export function InsightsDashboard({ history }: { history: any[] }) {
                 </div>
                 <Activity className="text-primary h-5 w-5" />
               </div>
-              <div className="flex-1 min-h-0">
+              {/* ✨ PRO FIX: Forced h-[350px] directly on the wrapper so Recharts cannot collapse */}
+              <div className="flex-1 w-full h-[350px] relative">
                 <ChartErrorBoundary>
                   {/* @ts-ignore */}
                   <ValueRadar data={activePrediction} maxValues={maxValues} simulation={simulateRenewable} />
@@ -195,7 +206,7 @@ export function InsightsDashboard({ history }: { history: any[] }) {
           </div>
 
           {/* Sankey Supply Chain */}
-          <div className="viz-card lg:col-span-8 h-[500px]">
+          <div className="viz-card lg:col-span-8 min-h-[500px]">
             <GlowingCard className="h-full p-8 flex flex-col">
               <div className="flex justify-between items-start mb-8">
                 <div>
@@ -204,10 +215,11 @@ export function InsightsDashboard({ history }: { history: any[] }) {
                 </div>
                 <div className="px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-[10px] font-black text-primary">LIVE FLOW</div>
               </div>
-              <div className="flex-1 min-h-0">
+              {/* ✨ PRO FIX: Forced h-[350px] directly on the wrapper so Nivo cannot collapse */}
+              <div className="flex-1 w-full h-[350px] relative">
                 <ChartErrorBoundary>
                   {/* @ts-ignore */}
-                  <SankeyChart data={activePrediction.sankey_data || activePrediction.visualizations?.sankey_data || { nodes: [], links: [] }} />
+                  <SankeyChart data={extractSankeyData(activePrediction)} />
                 </ChartErrorBoundary>
               </div>
             </GlowingCard>
