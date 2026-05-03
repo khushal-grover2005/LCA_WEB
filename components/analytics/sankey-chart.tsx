@@ -49,12 +49,11 @@ export function SankeyChart({ data }: { data: any }) {
     <div ref={containerRef} className="h-full w-full relative">
       <ResponsiveSankey
         data={data}
-        // ✨ Since the text is locked inside, we can reduce outer margins so the chart fills the whole card!
         margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
         align="justify"
         colors={CYBER_THEME_COLORS}
         nodeOpacity={1}
-        nodeThickness={48} // ✨ Thickened the pillars to comfortably hold the text
+        nodeThickness={48} 
         nodeInnerPadding={3}
         nodeSpacing={24} 
         nodeBorderWidth={0}
@@ -63,20 +62,44 @@ export function SankeyChart({ data }: { data: any }) {
         linkHoverOthersOpacity={0.05}
         linkHoverOpacity={0.8}
         enableLinkGradient={true}
-        labelPosition="inside"
         
-        // Keeping the glassmorphic tooltips intact
+        // 🚨 THE CRITICAL FIX: Kill Nivo's default horizontal label layer completely!
+        enableLabels={false}
+
+        // 🧨 OUR CUSTOM LAYER: This draws the pillar AND the vertical white text
+        node={(nodeProps: any) => {
+          const { node, x, y, width, height, color } = nodeProps;
+          
+          return (
+            <g transform={`translate(${x},${y})`}>
+              {/* The solid colored pillar */}
+              <rect width={width} height={height} fill={color} rx={6} ry={6} />
+              
+              {/* The text perfectly locked inside the center of the pillar */}
+              <text
+                x={width / 2}
+                y={height / 2}
+                textAnchor="middle"
+                dominantBaseline="central"
+                // Rotates the text 90 degrees perfectly around its own center
+                transform={`rotate(-90, ${width / 2}, ${height / 2})`}
+                fill="#FFFFFF" // Crisp white
+                style={{
+                  fontSize: 13,
+                  fontWeight: 900,
+                  fontFamily: 'var(--font-jetbrains), monospace', 
+                  letterSpacing: '0.15em',
+                  textShadow: '0px 2px 10px rgba(0,0,0,0.8)', 
+                  pointerEvents: 'none' 
+                }}
+              >
+                {node.id}
+              </text>
+            </g>
+          )
+        }}
+
         theme={{
-          labels: {
-            text: {
-              fill: '#FFFFFF',
-              fontSize: 13,
-              fontWeight: 900,
-              fontFamily: 'var(--font-jetbrains), monospace',
-              letterSpacing: '0.15em',
-              textShadow: '0px 2px 10px rgba(0,0,0,0.8)',
-            }
-          },
           tooltip: { 
             container: { 
               background: 'rgba(9, 9, 11, 0.95)', 
