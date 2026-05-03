@@ -103,6 +103,9 @@ export function PredictionsList({
     )
   }
 
+  // ✨ Define the consistent 8-column grid layout for desktop (added 50px at the start for the serial number)
+  const gridLayout = "md:grid-cols-[50px_1.2fr_1.5fr_0.8fr_0.8fr_0.8fr_auto_1.2fr]"
+
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-card shadow-lg shadow-black/5">
       {/* Terminal Header */}
@@ -112,35 +115,42 @@ export function PredictionsList({
           <div className="h-2.5 w-2.5 rounded-full bg-amber-500/60" />
           <div className="h-2.5 w-2.5 rounded-full bg-emerald-500/60" />
         </div>
-        <div className="ml-2 text-xs font-mono text-muted-foreground">
+        <div className="ml-2 text-xs font-mono text-muted-foreground uppercase tracking-widest">
           PREDICTION_LOG_TERMINAL_V1
         </div>
       </div>
 
       {/* Header Row (Desktop Only) */}
-      <div className="hidden grid-cols-[1.2fr_1.5fr_0.8fr_0.8fr_0.8fr_auto_1.2fr] gap-4 border-b border-border bg-muted/10 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground md:grid md:items-center">
+      <div className={`hidden gap-4 border-b border-border bg-muted/10 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground md:grid md:items-center ${gridLayout}`}>
+        <div className="text-muted-foreground/50">#</div>
         <div>Metal</div>
         <div>Route</div>
         <div className="text-right">GWP</div>
         <div className="text-right">Circularity</div>
         <div className="text-right">Recycled %</div>
         <div className="text-center w-16">Profile</div>
-        <div className="flex items-center justify-end gap-2">
+        <div className="flex items-center justify-end gap-2 text-right">
           <span>Date</span>
           <div className="w-8"></div>
         </div>
       </div>
 
       <ul className="divide-y divide-border/50">
-        {rows.map((row) => {
+        {rows.map((row, index) => {
           const isExpanded = !!expandedRows[row.id]
 
           return (
             <li
               key={row.id}
-              className="group grid grid-cols-1 gap-3 px-5 py-4 transition-all duration-300 hover:bg-primary/5 md:grid-cols-[1.2fr_1.5fr_0.8fr_0.8fr_0.8fr_auto_1.2fr] md:items-center md:gap-4"
+              className={`group grid grid-cols-1 gap-3 px-5 py-4 transition-all duration-300 hover:bg-primary/5 md:items-center md:gap-4 ${gridLayout}`}
             >
-              {/* ✨ FIX: Added Mobile-Only Route Header ✨ */}
+              {/* Serial Number */}
+              <div className="text-xs font-mono text-muted-foreground/60 md:block">
+                <span className="md:hidden font-bold mr-2 text-primary">ID:</span>
+                {(index + 1).toString().padStart(2, '0')}
+              </div>
+
+              {/* Mobile-Only Route Header & Metal Name */}
               <div className="flex flex-col md:block">
                 <div className="font-serif text-lg font-semibold group-hover:text-primary transition-colors">
                   {row.metal}
@@ -156,7 +166,7 @@ export function PredictionsList({
                 </div>
               </div>
               
-              {/* This block only shows on desktop devices */}
+              {/* Desktop Route display */}
               <div className="hidden text-sm text-muted-foreground md:block font-mono">
                 {row.production_route}
               </div>
@@ -232,7 +242,7 @@ export function PredictionsList({
 
               {/* Expandable Technical Profile Section */}
               {isExpanded && (
-                <div className="col-span-1 md:col-span-7 mt-4 rounded-xl bg-background/50 p-5 border border-border shadow-inner animate-in fade-in slide-in-from-top-2">
+                <div className="col-span-1 md:col-span-8 mt-4 rounded-xl bg-background/50 p-5 border border-border shadow-inner animate-in fade-in slide-in-from-top-2">
                   <h4 className="flex items-center gap-2 text-sm font-semibold text-foreground mb-4">
                     <FileText className="h-4 w-4 text-primary" />
                     Full Technical Profile
