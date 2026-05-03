@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/icon.png", // Pointing to the file in your /public folder
+        url: "/icon.png", 
         href: "/icon.png",
       },
     ],
@@ -44,9 +44,16 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${fraunces.variable} ${jetbrains.variable} bg-background`}>
-      <body className="font-sans antialiased">
+    <html lang="en" className={`${inter.variable} ${fraunces.variable} ${jetbrains.variable}`}>
+      {/* ✨ UPDATED: Added min-h-screen, text-foreground, and relative positioning */}
+      <body className="font-sans antialiased bg-background text-foreground min-h-screen relative z-0">
+        
+        {/* ✨ ADDED: The Global Ambient Background (Applies to EVERY page!) */}
+        <div className="fixed inset-0 bg-ore opacity-40 pointer-events-none -z-10" />
+        <div className="fixed inset-0 bg-grid opacity-20 pointer-events-none -z-10" />
+        
         {children}
+        
         <Toaster position="top-right" richColors closeButton />
       </body>
     </html>
