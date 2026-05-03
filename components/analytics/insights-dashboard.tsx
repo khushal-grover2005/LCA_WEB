@@ -8,12 +8,12 @@ import { GlowingCard } from "@/components/ui/glowing-card"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-// ✨ FIX: Safely handles both 'export function' AND 'export default function'
-const SankeyChart = dynamic(() => import("./sankey-chart").then(mod => mod.SankeyChart || mod.default), { 
+const SankeyChart = dynamic(() => import("./sankey-chart").then(mod => mod.SankeyChart), { 
   ssr: false,
   loading: () => <div className="h-full w-full flex items-center justify-center animate-pulse bg-muted/10 rounded-xl text-muted-foreground text-sm font-mono">Loading Flow...</div>
 })
-const ValueRadar = dynamic(() => import("./value-radar").then(mod => mod.ValueRadar || mod.default), { 
+
+const ValueRadar = dynamic(() => import("./value-radar").then(mod => mod.ValueRadar), { 
   ssr: false,
   loading: () => <div className="h-full w-full flex items-center justify-center animate-pulse bg-muted/10 rounded-xl text-muted-foreground text-sm font-mono">Loading Radar...</div>
 })
