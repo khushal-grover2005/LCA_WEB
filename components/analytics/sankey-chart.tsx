@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react"
 import { ResponsiveSankey } from "@nivo/sankey"
 import { gsap } from "gsap"
 
-// ✨ The "Final Blow" Theme Palette: Copper, Emerald, Cyan, Amber, Pink
+// The Premium Cyber Palette
 const CYBER_THEME_COLORS = [
   "#FF6B00", // Molten Copper
   "#10B981", // Emerald
@@ -22,12 +22,10 @@ export function SankeyChart({ data }: { data: any }) {
     if (!data || !data.nodes || data.nodes.length === 0) return;
 
     const ctx = gsap.context(() => {
-      // Fade in the flow links smoothly
       gsap.fromTo("path", 
         { opacity: 0 },
         { opacity: 0.5, duration: 1.5, stagger: 0.1, ease: "power2.out" }
       )
-      // Grow the nodes from the center
       gsap.from("rect", { 
         scaleY: 0, 
         transformOrigin: "center", 
@@ -52,39 +50,36 @@ export function SankeyChart({ data }: { data: any }) {
     <div ref={containerRef} className="h-full w-full relative -mt-4">
       <ResponsiveSankey
         data={data}
-        // ✨ FIX 1: Perfectly balanced margins to center the chart
-        // 140px on left and right gives the text massive room to sit outside the chart without overlapping!
-        margin={{ top: 40, right: 140, bottom: 40, left: 140 }}
+        // ✨ FIX 1: We can shrink the side margins now because the text is inside!
+        margin={{ top: 40, right: 40, bottom: 40, left: 40 }}
         align="justify"
-        // ✨ FIX 2: Injecting the premium color palette
         colors={CYBER_THEME_COLORS}
         nodeOpacity={1}
-        nodeThickness={16}
+        // ✨ FIX 2: Made the nodes much thicker (32px) so they act as pillars for the text
+        nodeThickness={32} 
         nodeInnerPadding={3}
-        nodeSpacing={36} // More space between vertical nodes to stop text crushing
+        nodeSpacing={24} 
         nodeBorderWidth={0}
         nodeBorderRadius={4}
         linkOpacity={0.35}
         linkHoverOthersOpacity={0.05}
         linkHoverOpacity={0.8}
         enableLinkGradient={true}
-        labelPosition="outside"
-        labelOrientation="horizontal"
-        labelPadding={20}
+        // ✨ FIX 3: Rotated the text vertically and moved it inside the pillars
+        labelPosition="inside"
+        labelOrientation="vertical"
+        labelPadding={16}
         theme={{
-          // ✨ FIX 3: Bright, readable text with glowing drop shadows
           labels: { 
             text: { 
-              fontSize: 11, 
-              fontWeight: 800, 
+              fontSize: 12, 
+              fontWeight: 900, 
               textTransform: 'uppercase', 
-              letterSpacing: '0.1em', 
-              fill: "#F8FAFC", // Bright white
-              // Heavy drop shadow ensures text is readable even if it crosses a colored link
-              textShadow: "0px 4px 15px rgba(0,0,0,1), 0px 0px 4px rgba(0,0,0,0.8)" 
+              letterSpacing: '0.2em', // Added extra spacing for sleek vertical reading
+              fill: "#FFFFFF", // Crisp white
+              textShadow: "0px 2px 8px rgba(0,0,0,0.9)" // Heavy shadow so it pops off the colored pillars
             } 
           },
-          // Customizing the hover tooltip to match our glassmorphism theme
           tooltip: { 
             container: { 
               background: 'rgba(9, 9, 11, 0.95)', 
