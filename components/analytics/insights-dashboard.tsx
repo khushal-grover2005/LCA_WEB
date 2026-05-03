@@ -123,7 +123,7 @@ export function InsightsDashboard({ history }: { history: any[] }) {
   }
 
   return (
-    <div ref={dashboardRef} className="space-y-8 pb-20">
+    <div ref={dashboardRef} className="space-y-8 pb-20 relative z-0">
       <div className="selection-box flex flex-col md:flex-row justify-between items-end gap-6 bg-card/30 p-8 rounded-[2rem] border border-border/50 backdrop-blur-md">
         <div className="space-y-4 flex-1 w-full">
           <label className="text-[10px] font-black uppercase tracking-[0.2em] text-primary ml-1">Archive Explorer</label>
