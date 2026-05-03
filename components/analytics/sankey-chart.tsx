@@ -49,7 +49,8 @@ export function SankeyChart({ data }: { data: any }) {
     <div ref={containerRef} className="h-full w-full relative">
       <ResponsiveSankey
         data={data}
-        margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
+        // ✨ THE FIX: Increased left and right margins to 60 so tooltips have room!
+        margin={{ top: 20, right: 60, bottom: 20, left: 60 }}
         align="justify"
         colors={CYBER_THEME_COLORS}
         nodeOpacity={1}
