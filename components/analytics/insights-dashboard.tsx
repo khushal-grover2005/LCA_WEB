@@ -247,9 +247,11 @@ export function InsightsDashboard({ history }: { history: any[] }) {
                 <ChartErrorBoundary>
                   <SankeyChart 
                     data={extractSankeyData(activePrediction) || {
+                      // ✨ BUG FIX: Safe, non-looping fallback data
                       nodes: [
                         { id: "Mining" }, { id: "Processing" }, { id: "Manufacturing" },
-                        { id: "Use Phase" }, { id: "End of Life" }, { id: "Recycling" }
+                        { id: "Use Phase" }, { id: "End of Life" }, { id: "Recycling" },
+                        { id: "Secondary Market" } // Added endpoint to break the loop
                       ],
                       links: [
                         { source: "Mining", target: "Processing", value: 80 },
@@ -257,7 +259,7 @@ export function InsightsDashboard({ history }: { history: any[] }) {
                         { source: "Manufacturing", target: "Use Phase", value: 70 },
                         { source: "Use Phase", target: "End of Life", value: 65 },
                         { source: "End of Life", target: "Recycling", value: 40 },
-                        { source: "Recycling", target: "Processing", value: 35 }
+                        { source: "Recycling", target: "Secondary Market", value: 35 } // Flow ends here safely
                       ]
                     }} 
                   />
