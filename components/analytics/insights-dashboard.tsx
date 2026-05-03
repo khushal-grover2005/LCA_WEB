@@ -46,12 +46,31 @@ export function InsightsDashboard({ history }: { history: any[] }) {
               <SelectValue placeholder="Select prediction log" />
             </SelectTrigger>
             <SelectContent className="z-[150]">
-              {history.map((h) => (
-                <SelectItem key={h.id} value={h.id}>
-                  <div className="flex items-center gap-4">
-                    <span className="font-bold">{h.metal}</span>
-                    <span className="text-xs opacity-40">|</span>
-                    <span className="text-xs font-mono opacity-60">{new Date(h.created_at).toLocaleDateString()}</span>
+              {/* ✨ Added index map, Serial No, and Fixed Widths for perfect alignment */}
+              {history.map((h, index) => (
+                <SelectItem key={h.id} value={h.id} className="cursor-pointer">
+                  <div className="flex items-center gap-3 w-full">
+                    {/* Serial Number */}
+                    <span className="text-xs font-mono text-muted-foreground/40 w-6">
+                      {(index + 1).toString().padStart(2, '0')}
+                    </span>
+                    
+                    {/* Metal Name (Fixed width ensures pipe and date perfectly align) */}
+                    <span className="font-bold w-28 text-left truncate">
+                      {h.metal}
+                    </span>
+                    
+                    {/* Divider */}
+                    <span className="text-xs opacity-30 shrink-0">|</span>
+                    
+                    {/* Date (using en-GB to guarantee DD/MM/YYYY formatting) */}
+                    <span className="text-xs font-mono opacity-60 tracking-wider">
+                      {new Date(h.created_at).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric"
+                      })}
+                    </span>
                   </div>
                 </SelectItem>
               ))}
