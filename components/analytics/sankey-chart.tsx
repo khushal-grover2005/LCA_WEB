@@ -21,7 +21,6 @@ export function SankeyChart({ data }: { data: any }) {
     return () => ctx.revert()
   }, [data])
 
-  // If no data, show message instead of crashing
   if (!data || !data.nodes || data.nodes.length === 0) {
     return (
       <div className="h-full w-full flex items-center justify-center text-muted-foreground text-sm italic border-2 border-dashed border-border/10 rounded-xl">
@@ -50,7 +49,7 @@ export function SankeyChart({ data }: { data: any }) {
         labelPadding={20}
         labelTextColor="hsl(var(--muted-foreground))"
         theme={{
-          labels: { text: { fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' } },
+          labels: { text: { fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', fill: "hsl(var(--foreground))" } },
           tooltip: { container: { background: 'hsl(var(--popover))', color: 'hsl(var(--popover-foreground))', borderRadius: '12px', border: '1px solid hsl(var(--border))', boxShadow: '0 20px 40px rgba(0,0,0,0.4)' } }
         }}
       />
