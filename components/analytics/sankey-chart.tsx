@@ -21,10 +21,12 @@ export function SankeyChart({ data }: { data: any }) {
     if (!data || !data.nodes || data.nodes.length === 0) return;
 
     const ctx = gsap.context(() => {
+      // Animate flow links
       gsap.fromTo("path", 
         { opacity: 0 },
         { opacity: 0.35, duration: 1.5, stagger: 0.1, ease: "power2.out" }
       )
+      // Animate pillars (nodes)
       gsap.from("rect", { 
         scaleY: 0, 
         transformOrigin: "center", 
@@ -49,8 +51,9 @@ export function SankeyChart({ data }: { data: any }) {
     <div ref={containerRef} className="h-full w-full relative">
       <ResponsiveSankey
         data={data}
-        // ✨ THE FIX: Increased left and right margins to 60 so tooltips have room!
-        margin={{ top: 20, right: 60, bottom: 20, left: 60 }}
+        // ✨ THE FINAL FIX: 130px left/right margins provide a "safe zone" 
+        // for wide tooltips to render without hitting the card's overflow boundary.
+        margin={{ top: 30, right: 130, bottom: 30, left: 130 }}
         align="justify"
         colors={CYBER_THEME_COLORS}
         nodeOpacity={1}
@@ -64,27 +67,26 @@ export function SankeyChart({ data }: { data: any }) {
         linkHoverOpacity={0.8}
         enableLinkGradient={true}
         
-        // 🚨 THE CRITICAL FIX: Kill Nivo's default horizontal label layer completely!
+        // Disable default labels to prevent horizontal clashing
         enableLabels={false}
 
-        // 🧨 OUR CUSTOM LAYER: This draws the pillar AND the vertical white text
+        // CUSTOM NODE RENDERER: Forces vertical, centered white text inside pillars
         node={(nodeProps: any) => {
           const { node, x, y, width, height, color } = nodeProps;
           
           return (
             <g transform={`translate(${x},${y})`}>
-              {/* The solid colored pillar */}
+              {/* Colored Data Pillar */}
               <rect width={width} height={height} fill={color} rx={6} ry={6} />
               
-              {/* The text perfectly locked inside the center of the pillar */}
+              {/* Vertically Locked Text */}
               <text
                 x={width / 2}
                 y={height / 2}
                 textAnchor="middle"
                 dominantBaseline="central"
-                // Rotates the text 90 degrees perfectly around its own center
                 transform={`rotate(-90, ${width / 2}, ${height / 2})`}
-                fill="#FFFFFF" // Crisp white
+                fill="#FFFFFF"
                 style={{
                   fontSize: 13,
                   fontWeight: 900,
