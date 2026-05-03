@@ -1,19 +1,22 @@
 "use client"
 
 import { useState, useMemo, useRef, useEffect } from "react"
+import dynamic from "next/dynamic"
 import { gsap } from "gsap"
-import { Zap, Activity, Info, BarChart3, ChevronRight } from "lucide-react"
+import { Zap, Activity, ChevronRight } from "lucide-react"
 import { GlowingCard } from "@/components/ui/glowing-card"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { SankeyChart } from "./sankey-chart"
-import { ValueRadar } from "./value-radar"
+
+// Dynamic imports prevent server-side hydration crashes
+const SankeyChart = dynamic(() => import("./sankey-chart").then(mod => mod.SankeyChart), { ssr: false })
+const ValueRadar = dynamic(() => import("./value-radar").then(mod => mod.ValueRadar), { ssr: false })
 
 export function InsightsDashboard({ history }: { history: any[] }) {
   const [selectedId, setSelectedId] = useState(history[0]?.id)
   const [isAnalyzed, setIsAnalyzed] = useState(false)
   const [simulateRenewable, setSimulateRenewable] = useState(false)
-  const dashboardRef = useRef(null)
+  const dashboardRef = useRef<HTMLDivElement>(null)
 
   const activePrediction = useMemo(() => 
     history.find(p => p.id === selectedId), 
@@ -25,14 +28,22 @@ export function InsightsDashboard({ history }: { history: any[] }) {
     recycled: 100
   }), [history])
 
-  const handleAnalyze = () => {
-    setIsAnalyzed(true)
+  // ✨ THE FIX: We use useEffect so GSAP waits for React to render the charts first
+  useEffect(() => {
+    if (!isAnalyzed || !activePrediction) return;
+
     const ctx = gsap.context(() => {
       const tl = gsap.timeline()
       tl.to(".selection-box", { y: -15, duration: 0.5, ease: "power2.out" })
         .fromTo(".analysis-grid", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.8, ease: "expo.out" })
-        .from(".viz-card", { scale: 0.9, opacity: 0, stagger: 0.15, ease: "back.out(1.2)", duration: 0.6 })
+        .from(".viz-card", { scale: 0.9, opacity: 0, stagger: 0.15, ease: "back.out(1.2)", duration: 0.6 }, "-=0.4")
     }, dashboardRef)
+
+    return () => ctx.revert()
+  }, [isAnalyzed, activePrediction]) // Runs every time these change
+
+  const handleAnalyze = () => {
+    setIsAnalyzed(true)
   }
 
   return (
@@ -46,29 +57,19 @@ export function InsightsDashboard({ history }: { history: any[] }) {
               <SelectValue placeholder="Select prediction log" />
             </SelectTrigger>
             <SelectContent className="z-[150]">
-              {/* ✨ Added index map, Serial No, and Fixed Widths for perfect alignment */}
               {history.map((h, index) => (
                 <SelectItem key={h.id} value={h.id} className="cursor-pointer">
                   <div className="flex items-center gap-3 w-full">
-                    {/* Serial Number */}
                     <span className="text-xs font-mono text-muted-foreground/40 w-6">
                       {(index + 1).toString().padStart(2, '0')}
                     </span>
-                    
-                    {/* Metal Name (Fixed width ensures pipe and date perfectly align) */}
                     <span className="font-bold w-28 text-left truncate">
                       {h.metal}
                     </span>
-                    
-                    {/* Divider */}
                     <span className="text-xs opacity-30 shrink-0">|</span>
-                    
-                    {/* Date (using en-GB to guarantee DD/MM/YYYY formatting) */}
                     <span className="text-xs font-mono opacity-60 tracking-wider">
                       {new Date(h.created_at).toLocaleDateString("en-GB", {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric"
+                        day: "2-digit", month: "2-digit", year: "numeric"
                       })}
                     </span>
                   </div>
@@ -111,7 +112,8 @@ export function InsightsDashboard({ history }: { history: any[] }) {
                 <div className="px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-[10px] font-black text-primary">LIVE FLOW</div>
               </div>
               <div className="flex-1 min-h-0">
-                <SankeyChart data={activePrediction.visualizations.sankey_data} />
+                {/* Optional chaining added here just in case a database entry is missing viz data */}
+                <SankeyChart data={activePrediction.visualizations?.sankey_data || { nodes: [], links: [] }} />
               </div>
             </GlowingCard>
           </div>
