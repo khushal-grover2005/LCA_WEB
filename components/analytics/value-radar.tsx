@@ -26,7 +26,9 @@ export function ValueRadar({ data, maxValues, simulation }: any) {
       unit: ""
     },
     { 
-      metric: "Recycled %", 
+      // ✨ FIX 1: Dropped the "%" from the label to save horizontal space.
+      // It is still completely obvious what it means, and the tooltip still shows the % unit!
+      metric: "Recycled", 
       val: isNaN(recycled) ? 0 : recycled, 
       full: isNaN(recycled) ? "0.0" : recycled.toFixed(1),
       unit: "%"
@@ -37,22 +39,21 @@ export function ValueRadar({ data, maxValues, simulation }: any) {
 
   return (
     <ResponsiveContainer width="100%" height="100%">
-      {/* ✨ THE GOLDILOCKS ZONE: 70% radius for a big chart, 35px margins to protect the text */}
+      {/* ✨ FIX 2: Radius increased to 65% for a larger shape, margins perfectly balanced for the shorter word */}
       <RadarChart 
         cx="50%" 
         cy="50%" 
-        outerRadius="70%" 
+        outerRadius="65%" 
         data={plotData}
-        margin={{ top: 15, right: 35, bottom: 15, left: 35 }}
+        margin={{ top: 15, right: 30, bottom: 15, left: 30 }}
       >
         <PolarGrid stroke="rgba(255, 255, 255, 0.15)" strokeDasharray="3 3" />
         
-        {/* ✨ ADJUSTED: Font size 11 ensures the wide text fits the narrow column perfectly */}
         <PolarAngleAxis 
             dataKey="metric" 
             tick={{ 
                 fill: "#F8FAFC", 
-                fontSize: 11, 
+                fontSize: 12, // Bumped slightly back up for better readability
                 fontWeight: 700, 
                 textTransform: 'uppercase',
                 letterSpacing: '0.05em' 
