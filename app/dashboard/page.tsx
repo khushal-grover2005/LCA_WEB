@@ -17,6 +17,7 @@ export default async function DashboardPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser()
+  
   if (!user) redirect("/auth/login?redirect=/dashboard")
 
   const { data: predictions, error } = await supabase
@@ -30,6 +31,7 @@ export default async function DashboardPage() {
   const rows = predictions ?? []
 
   return (
+    // ✨ THEME FIX: The main wrapper is now transparent so the global background shows!
     <div className="flex min-h-dvh flex-col relative z-10">
       <SiteNav />
       <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-10 md:py-16">

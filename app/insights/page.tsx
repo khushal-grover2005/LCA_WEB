@@ -2,7 +2,7 @@ import { redirect } from "next/navigation"
 import { Target } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { InsightsDashboard } from "@/components/analytics/insights-dashboard"
-import { SiteNav } from "@/components/site-nav" // ✨ Manual import
+import { SiteNav } from "@/components/site-nav" 
 
 export default async function InsightsPage() {
   const supabase = await createClient()
@@ -16,15 +16,16 @@ export default async function InsightsPage() {
     .order("created_at", { ascending: false })
 
   return (
-    <div className="flex min-h-dvh flex-col bg-background">
-      {/* ✨ Navbar added locally to match LandingPage structure */}
+    // ✨ THEME FIX: Removed bg-background and added relative z-10 so the global orbs shine through!
+    <div className="flex min-h-dvh flex-col relative z-10">
       <SiteNav /> 
       
       {/* Changed pt-10 to pt-24 to provide space under the sticky nav */}
       <main className="mx-auto w-full max-w-7xl flex-1 px-6 py-10 pt-24">
         <div className="mb-12 px-6">
-          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-primary">
-            <Target className="h-3 w-3" />
+          {/* ✨ THEME UPGRADE: Glassmorphic Copper Badge */}
+          <div className="inline-flex items-center gap-2 rounded-full border border-border/50 bg-card/40 backdrop-blur-md px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-copper">
+            <Target className="h-3 w-3 animate-spark" />
             Decision Intelligence
           </div>
           <h1 className="mt-6 font-serif text-5xl font-bold tracking-tight">Analytics & Insights</h1>

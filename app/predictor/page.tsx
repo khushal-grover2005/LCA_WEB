@@ -19,15 +19,17 @@ export default async function PredictorPage() {
   return (
     <div className="flex min-h-dvh flex-col relative z-10">
       <SiteNav />
-      <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-10 md:py-16">
+      
+      {/* ✨ FIX: Changed top padding to pt-24 so it perfectly clears your sticky navbar */}
+      <main className="mx-auto w-full max-w-5xl flex-1 px-6 pb-16 pt-24">
         <div className="mb-10">
-          {/* ✨ THEME UPGRADE: Glassmorphic badge with glowing zap */}
+          {/* Glassmorphic badge with glowing zap */}
           <div className="inline-flex items-center gap-2 rounded-full border border-border/50 bg-card/40 backdrop-blur-md px-3 py-1 text-xs text-muted-foreground">
             <Zap className="h-3 w-3 text-copper animate-spark" />
             Predictor Engine
           </div>
           
-          {/* ✨ THEME UPGRADE: Copper text glow applied to the heading */}
+          {/* Copper text glow applied to the heading */}
           <h1 className="mt-4 font-serif text-4xl font-semibold tracking-tight md:text-5xl text-balance">
             Predict the life-cycle of <span className="text-copper text-glow-copper">any metal.</span>
           </h1>
