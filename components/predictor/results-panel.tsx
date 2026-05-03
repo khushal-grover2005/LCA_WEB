@@ -44,6 +44,11 @@ export function ResultsPanel({ response, inputPayload, authenticated }: Props) {
   const imputed = new Set(response.imputed_fields ?? [])
   const profile = response.technical_profile ?? {}
 
+  // ✨ THE FIX: Reset the saved state whenever a new prediction is generated
+  useEffect(() => {
+    setSaved(false)
+  }, [response])
+
   useEffect(() => {
     const ctx = gsap.context(() => {
       gsap.from(".result-card", {
