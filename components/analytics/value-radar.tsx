@@ -36,21 +36,42 @@ export function ValueRadar({ data, maxValues, simulation }: any) {
     }
   ]
 
+  // ✨ NEW: Dynamic Visibility color scheme based on the Circularity performance tone
+  // High scores are vibrant emerald, medium are vibrant amber, low are vibrant red.
+  // This provides maximum contract and follows semantic color meanings.
+  const dynamicVisibleColor = circularity > 70 ? "#10B981" : circularity > 50 ? "#F59E0B" : "#EF4444"; 
+
   return (
     <ResponsiveContainer width="100%" height="100%">
       <RadarChart cx="50%" cy="50%" outerRadius="80%" data={plotData}>
-        <PolarGrid stroke="hsl(var(--border))" strokeDasharray="4 4" />
-        <PolarAngleAxis dataKey="metric" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11, fontWeight: 700 }} />
+        {/* ✨ PRO FIX: Much Brighter, legible labels with increased size, bolding, and uppercase */}
+        <PolarAngleAxis 
+            dataKey="metric" 
+            tick={{ 
+                fill: "hsl(var(--foreground))", 
+                fontSize: 12, 
+                fontWeight: 700, 
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em' 
+            }} 
+        />
+        
+        {/* ✨ PRO FIX: Brighter, more defined dashed grid lines */}
+        <PolarGrid stroke="hsl(var(--muted))" strokeDasharray="4 4" />
+        
         <PolarRadiusAxis domain={[0, 100]} tick={false} axisLine={false} />
+        
+        {/* ✨ PRO FIX: High-contrast, dynamic color scheme with increased opacity for proper dynamic visibility */}
         <Radar
           name="Metal Score"
           dataKey="val"
-          stroke="hsl(var(--primary))"
-          fill="hsl(var(--primary))"
-          fillOpacity={0.4}
+          stroke={dynamicVisibleColor} // Vibrant Dynamic Color
+          fill={dynamicVisibleColor} // Vibrant Dynamic Color
+          fillOpacity={0.65} // Increased for a stronger presence
           isAnimationActive={true}
           animationDuration={1500}
         />
+        
         <Tooltip 
           contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px', fontWeight: 'bold' }} 
         />
