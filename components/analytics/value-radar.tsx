@@ -2,6 +2,36 @@
 
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from "recharts"
 
+// ✨ THE MAGIC FIX: A custom label renderer. 
+// This manually nudges the text inward so it NEVER clips, 
+// allowing us to make the spider web as massive as we want!
+function CustomTick({ payload, x, y }: any) {
+  let dx = 0;
+  let dy = 0;
+
+  // Nudge each label inward, away from the invisible SVG edges
+  if (payload.value === "GWP") dy = 10; // Push down slightly
+  if (payload.value.includes("Recycled")) dx = 28; // Push hard right
+  if (payload.value === "Circularity") dx = -28; // Push hard left
+
+  return (
+    <text
+      x={x}
+      y={y}
+      dx={dx}
+      dy={dy}
+      textAnchor="middle"
+      fill="#F8FAFC"
+      fontSize={12}
+      fontWeight={700}
+      textTransform="uppercase"
+      letterSpacing="0.05em"
+    >
+      {payload.value}
+    </text>
+  );
+}
+
 export function ValueRadar({ data, maxValues, simulation }: any) {
   const rawGwp = Number(data?.results?.gwp_total ?? data?.gwp_total ?? 0);
   const circularity = Number(data?.results?.circularity_index ?? data?.circularity_index ?? 0);
@@ -26,9 +56,8 @@ export function ValueRadar({ data, maxValues, simulation }: any) {
       unit: ""
     },
     { 
-      // ✨ FIX 1: Dropped the "%" from the label to save horizontal space.
-      // It is still completely obvious what it means, and the tooltip still shows the % unit!
-      metric: "Recycled", 
+      // You can safely keep the % here now!
+      metric: "Recycled %", 
       val: isNaN(recycled) ? 0 : recycled, 
       full: isNaN(recycled) ? "0.0" : recycled.toFixed(1),
       unit: "%"
@@ -39,25 +68,20 @@ export function ValueRadar({ data, maxValues, simulation }: any) {
 
   return (
     <ResponsiveContainer width="100%" height="100%">
-      {/* ✨ FIX 2: Radius increased to 65% for a larger shape, margins perfectly balanced for the shorter word */}
+      {/* ✨ INCREASED RADIUS: Blown up to 80% for a massive spider web */}
       <RadarChart 
         cx="50%" 
         cy="50%" 
-        outerRadius="65%" 
+        outerRadius="80%" 
         data={plotData}
-        margin={{ top: 15, right: 30, bottom: 15, left: 30 }}
+        margin={{ top: 10, right: 10, bottom: 10, left: 10 }}
       >
         <PolarGrid stroke="rgba(255, 255, 255, 0.15)" strokeDasharray="3 3" />
         
+        {/* ✨ Triggering our custom inward-nudging labels */}
         <PolarAngleAxis 
             dataKey="metric" 
-            tick={{ 
-                fill: "#F8FAFC", 
-                fontSize: 12, // Bumped slightly back up for better readability
-                fontWeight: 700, 
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em' 
-            }} 
+            tick={<CustomTick />} 
         />
         
         <PolarRadiusAxis domain={[0, 100]} tick={false} axisLine={false} />
