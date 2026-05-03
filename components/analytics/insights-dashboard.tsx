@@ -8,7 +8,6 @@ import { GlowingCard } from "@/components/ui/glowing-card"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-// ✨ PRO FIX: Added loading states so GSAP doesn't panic while waiting for these to mount
 const SankeyChart = dynamic(() => import("./sankey-chart").then(mod => mod.SankeyChart), { 
   ssr: false,
   loading: () => <div className="h-full w-full flex items-center justify-center animate-pulse bg-muted/10 rounded-xl text-muted-foreground text-sm font-mono">Loading Flow...</div>
@@ -22,7 +21,9 @@ export function InsightsDashboard({ history }: { history: any[] }) {
   const [selectedId, setSelectedId] = useState(history?.[0]?.id || null)
   const [isAnalyzed, setIsAnalyzed] = useState(false)
   const [simulateRenewable, setSimulateRenewable] = useState(false)
+  
   const dashboardRef = useRef<HTMLDivElement>(null)
+  const analysisRef = useRef<HTMLDivElement>(null) // ✨ NEW: Reference for auto-scrolling
 
   const activePrediction = useMemo(() => 
     history?.find(p => p.id === selectedId), 
@@ -31,17 +32,29 @@ export function InsightsDashboard({ history }: { history: any[] }) {
   const maxValues = useMemo(() => {
     if (!history || history.length === 0) return { gwp: 1, circularity: 100, recycled: 100 };
     return {
-      // Safely check for results.gwp_total, default to 1 if missing
-      gwp: Math.max(...history.map(p => p.results?.gwp_total || 1)),
+      // ✨ FIX: Check flat column 'gwp_total' instead of nested 'results.gwp_total'
+      gwp: Math.max(...history.map(p => p.gwp_total || p.results?.gwp_total || 1)),
       circularity: 100,
       recycled: 100
     }
   }, [history])
 
+  const handleAnalyze = () => {
+    setIsAnalyzed(true)
+    
+    // ✨ NEW: Auto-scroll logic. Wait 100ms for React to render the grid, then scroll.
+    setTimeout(() => {
+      if (analysisRef.current) {
+        const yOffset = -100; // Offset to not hide beneath the sticky navbar
+        const y = analysisRef.current.getBoundingClientRect().top + window.scrollY + yOffset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
+    }, 100)
+  }
+
   useEffect(() => {
     if (!isAnalyzed || !activePrediction) return;
 
-    // ✨ PRO FIX: 50ms delay gives React time to put the dynamic charts into the DOM before animating
     const timer = setTimeout(() => {
       const ctx = gsap.context(() => {
         const tl = gsap.timeline()
@@ -55,7 +68,6 @@ export function InsightsDashboard({ history }: { history: any[] }) {
     return () => clearTimeout(timer)
   }, [isAnalyzed, activePrediction])
 
-  // ✨ PRO FIX: Handle empty database safely
   if (!history || history.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 bg-card/30 rounded-[2rem] border border-border/50">
@@ -100,7 +112,7 @@ export function InsightsDashboard({ history }: { history: any[] }) {
         </div>
         <Button 
           size="lg" 
-          onClick={() => setIsAnalyzed(true)} 
+          onClick={handleAnalyze} 
           disabled={!selectedId}
           className="h-14 px-12 font-black text-sm tracking-widest bg-primary shadow-[0_10px_30px_rgba(var(--primary),0.2)] hover:scale-105 transition-all"
         >
@@ -109,7 +121,7 @@ export function InsightsDashboard({ history }: { history: any[] }) {
       </div>
 
       {isAnalyzed && activePrediction && (
-        <div className="analysis-grid grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div ref={analysisRef} className="analysis-grid grid grid-cols-1 lg:grid-cols-12 gap-8 scroll-mt-24">
           
           {/* Radar Visualization */}
           <div className="viz-card lg:col-span-4 h-[500px]">
@@ -122,8 +134,8 @@ export function InsightsDashboard({ history }: { history: any[] }) {
                 <Activity className="text-primary h-5 w-5" />
               </div>
               <div className="flex-1 min-h-0">
-                {/* ✨ PRO FIX: Ensure activePrediction.results exists before passing it */}
-                {activePrediction.results ? (
+                {/* ✨ FIX: We now check the flat database columns directly */}
+                {(activePrediction.gwp_total || activePrediction.results) ? (
                   <ValueRadar data={activePrediction} maxValues={maxValues} simulation={simulateRenewable} />
                 ) : (
                   <div className="h-full flex items-center justify-center text-sm text-muted-foreground italic">No performance data saved.</div>
@@ -143,8 +155,8 @@ export function InsightsDashboard({ history }: { history: any[] }) {
                 <div className="px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-[10px] font-black text-primary">LIVE FLOW</div>
               </div>
               <div className="flex-1 min-h-0">
-                {/* ✨ PRO FIX: Safely fallback to an empty chart if visualizations are missing */}
-                <SankeyChart data={activePrediction.visualizations?.sankey_data || { nodes: [], links: [] }} />
+                {/* ✨ FIX: Checks flat column first, then nested visualisations, then falls back to empty */}
+                <SankeyChart data={activePrediction.sankey_data || activePrediction.visualizations?.sankey_data || { nodes: [], links: [] }} />
               </div>
             </GlowingCard>
           </div>
