@@ -97,7 +97,8 @@ export function Hero() {
         ))}
       </div>
 
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-12 px-6 lg:grid-cols-2 lg:items-center">
+      {/* ✨ FIX: Changed lg:items-center to lg:items-start here */}
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-12 px-6 lg:grid-cols-2 lg:items-start">
         <div>
           <div className="hero-eyebrow mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1 text-xs text-muted-foreground backdrop-blur-sm">
             <Sparkles className="h-3 w-3 text-primary" />
@@ -152,7 +153,8 @@ export function Hero() {
           </dl>
         </div>
 
-        <div className="hero-visual relative">
+        {/* ✨ FIX: Added lg:mt-[52px] to push the image down past the eyebrow height */}
+        <div className="hero-visual relative lg:mt-[52px]">
           <div className="relative aspect-square overflow-hidden rounded-2xl border border-border/60 bg-card shadow-2xl shadow-primary/20">
             <Image
               src="/hero-mining.jpg"
