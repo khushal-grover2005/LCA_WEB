@@ -37,22 +37,24 @@ export function ValueRadar({ data, maxValues, simulation }: any) {
 
   return (
     <ResponsiveContainer width="100%" height="100%">
-      {/* ✨ FIX: Added margin={{ top: 20, right: 40, bottom: 20, left: 40 }} to prevent edge clipping, and tweaked radius to 55% */}
+      {/* ✨ THE GOLDILOCKS ZONE: 70% radius for a big chart, 35px margins to protect the text */}
       <RadarChart 
         cx="50%" 
         cy="50%" 
-        outerRadius="55%" 
+        outerRadius="70%" 
         data={plotData}
-        margin={{ top: 20, right: 40, bottom: 20, left: 40 }}
+        margin={{ top: 15, right: 35, bottom: 15, left: 35 }}
       >
         <PolarGrid stroke="rgba(255, 255, 255, 0.15)" strokeDasharray="3 3" />
         
+        {/* ✨ ADJUSTED: Font size 11 ensures the wide text fits the narrow column perfectly */}
         <PolarAngleAxis 
             dataKey="metric" 
             tick={{ 
                 fill: "#F8FAFC", 
-                fontSize: 13, 
+                fontSize: 11, 
                 fontWeight: 700, 
+                textTransform: 'uppercase',
                 letterSpacing: '0.05em' 
             }} 
         />
