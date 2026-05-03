@@ -1,8 +1,6 @@
 import type { Metadata, Viewport } from "next"
 import { Inter, Fraunces, JetBrains_Mono } from "next/font/google"
 import { Toaster } from "@/components/ui/sonner"
-import { SiteNav } from "@/components/site-nav" // ✨ Added import
-import { SiteFooter } from "@/components/site-footer" // ✨ Added import
 import "./globals.css"
 
 const inter = Inter({
@@ -29,7 +27,7 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/icon.png",
+        url: "/icon.png", // Pointing to the file in your /public folder
         href: "/icon.png",
       },
     ],
@@ -47,19 +45,8 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${inter.variable} ${fraunces.variable} ${jetbrains.variable} bg-background`}>
-      {/* ✨ Added flex flex-col to keep footer at bottom */}
-      <body className="font-sans antialiased flex min-h-screen flex-col">
-        {/* ✨ Global Navbar */}
-        <SiteNav /> 
-        
-        {/* ✨ Main content wrapper */}
-        <main className="flex-1">
-          {children}
-        </main>
-
-        {/* ✨ Global Footer[cite: 1] */}
-        <SiteFooter />
-
+      <body className="font-sans antialiased">
+        {children}
         <Toaster position="top-right" richColors closeButton />
       </body>
     </html>
