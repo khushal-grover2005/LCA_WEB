@@ -3,16 +3,13 @@
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from "recharts"
 
 export function ValueRadar({ data, maxValues, simulation }: any) {
-  // 1. Aggressively extract values
   const rawGwp = Number(data?.results?.gwp_total ?? data?.gwp_total ?? 0);
   const circularity = Number(data?.results?.circularity_index ?? data?.circularity_index ?? 0);
   const recycled = Number(data?.technical_profile?.recycled_content_pct ?? data?.recycled_content_est ?? 0);
 
-  // 2. Safely calculate percentages
   const gwp = simulation ? rawGwp * 0.4 : rawGwp;
   const safeMaxGwp = Number(maxValues?.gwp) || 1; 
   
-  // 3. Fallback to 0 if NaN, invert so lower GWP = higher score
   const gwpScore = Math.max(0, (1 - (gwp / safeMaxGwp)) * 100);
 
   const plotData = [
@@ -40,13 +37,16 @@ export function ValueRadar({ data, maxValues, simulation }: any) {
 
   return (
     <ResponsiveContainer width="100%" height="100%">
-      {/* ✨ FIX 1: Reduced outerRadius from 80% to 65% so the text labels don't get cut off at the edges */}
-      <RadarChart cx="50%" cy="50%" outerRadius="65%" data={plotData}>
-        
-        {/* ✨ FIX 2: Hardcoded stroke to a semi-transparent white so the spider web is ALWAYS visible */}
+      {/* ✨ FIX: Added margin={{ top: 20, right: 40, bottom: 20, left: 40 }} to prevent edge clipping, and tweaked radius to 55% */}
+      <RadarChart 
+        cx="50%" 
+        cy="50%" 
+        outerRadius="55%" 
+        data={plotData}
+        margin={{ top: 20, right: 40, bottom: 20, left: 40 }}
+      >
         <PolarGrid stroke="rgba(255, 255, 255, 0.15)" strokeDasharray="3 3" />
         
-        {/* ✨ FIX 3: Hardcoded text fill to a crisp off-white (#F8FAFC) for perfect readability */}
         <PolarAngleAxis 
             dataKey="metric" 
             tick={{ 
