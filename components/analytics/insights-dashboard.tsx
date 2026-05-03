@@ -2,20 +2,31 @@
 
 import { useState, useMemo, useRef, useEffect } from "react"
 import dynamic from "next/dynamic"
-import { gsap } from "gsap"
+import gsap from "gsap" // ✨ FIX: Changed to default import
 import { Zap, Activity, ChevronRight, AlertCircle } from "lucide-react"
 import { GlowingCard } from "@/components/ui/glowing-card"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-const SankeyChart = dynamic(() => import("./sankey-chart").then(mod => mod.SankeyChart), { 
+// ✨ FIX: Safely handles both 'export function' AND 'export default function'
+const SankeyChart = dynamic(() => import("./sankey-chart").then(mod => mod.SankeyChart || mod.default), { 
   ssr: false,
   loading: () => <div className="h-full w-full flex items-center justify-center animate-pulse bg-muted/10 rounded-xl text-muted-foreground text-sm font-mono">Loading Flow...</div>
 })
-const ValueRadar = dynamic(() => import("./value-radar").then(mod => mod.ValueRadar), { 
+const ValueRadar = dynamic(() => import("./value-radar").then(mod => mod.ValueRadar || mod.default), { 
   ssr: false,
   loading: () => <div className="h-full w-full flex items-center justify-center animate-pulse bg-muted/10 rounded-xl text-muted-foreground text-sm font-mono">Loading Radar...</div>
 })
+
+// ✨ FIX: Hydration-safe date formatter (prevents Server/Browser timezone crashes)
+const formatSafeDate = (isoString: string) => {
+  try {
+    const d = new Date(isoString);
+    return `${d.getUTCDate().toString().padStart(2, '0')}/${(d.getUTCMonth() + 1).toString().padStart(2, '0')}/${d.getUTCFullYear()}`;
+  } catch (e) {
+    return "Unknown Date";
+  }
+}
 
 export function InsightsDashboard({ history }: { history: any[] }) {
   const [selectedId, setSelectedId] = useState(history?.[0]?.id || null)
@@ -23,7 +34,7 @@ export function InsightsDashboard({ history }: { history: any[] }) {
   const [simulateRenewable, setSimulateRenewable] = useState(false)
   
   const dashboardRef = useRef<HTMLDivElement>(null)
-  const analysisRef = useRef<HTMLDivElement>(null) // ✨ NEW: Reference for auto-scrolling
+  const analysisRef = useRef<HTMLDivElement>(null)
 
   const activePrediction = useMemo(() => 
     history?.find(p => p.id === selectedId), 
@@ -32,8 +43,8 @@ export function InsightsDashboard({ history }: { history: any[] }) {
   const maxValues = useMemo(() => {
     if (!history || history.length === 0) return { gwp: 1, circularity: 100, recycled: 100 };
     return {
-      // ✨ FIX: Check flat column 'gwp_total' instead of nested 'results.gwp_total'
-      gwp: Math.max(...history.map(p => p.gwp_total || p.results?.gwp_total || 1)),
+      // ✨ FIX: Ensured values are treated as numbers to prevent Math.max from returning NaN
+      gwp: Math.max(...history.map(p => Number(p.gwp_total) || Number(p.results?.gwp_total) || 1)),
       circularity: 100,
       recycled: 100
     }
@@ -42,10 +53,9 @@ export function InsightsDashboard({ history }: { history: any[] }) {
   const handleAnalyze = () => {
     setIsAnalyzed(true)
     
-    // ✨ NEW: Auto-scroll logic. Wait 100ms for React to render the grid, then scroll.
     setTimeout(() => {
       if (analysisRef.current) {
-        const yOffset = -100; // Offset to not hide beneath the sticky navbar
+        const yOffset = -100;
         const y = analysisRef.current.getBoundingClientRect().top + window.scrollY + yOffset;
         window.scrollTo({ top: y, behavior: 'smooth' });
       }
@@ -55,17 +65,21 @@ export function InsightsDashboard({ history }: { history: any[] }) {
   useEffect(() => {
     if (!isAnalyzed || !activePrediction) return;
 
+    let ctx: gsap.Context; // ✨ FIX: Properly scope the GSAP context
+    
     const timer = setTimeout(() => {
-      const ctx = gsap.context(() => {
+      ctx = gsap.context(() => {
         const tl = gsap.timeline()
         tl.to(".selection-box", { y: -15, duration: 0.5, ease: "power2.out" })
           .fromTo(".analysis-grid", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.8, ease: "expo.out" })
           .from(".viz-card", { scale: 0.95, opacity: 0, stagger: 0.1, ease: "back.out(1.2)", duration: 0.5 }, "-=0.4")
       }, dashboardRef)
-      return () => ctx.revert()
     }, 50)
 
-    return () => clearTimeout(timer)
+    return () => {
+      clearTimeout(timer)
+      if (ctx) ctx.revert() // ✨ FIX: Prevents memory leaks if unmounted quickly
+    }
   }, [isAnalyzed, activePrediction])
 
   if (!history || history.length === 0) {
@@ -100,9 +114,7 @@ export function InsightsDashboard({ history }: { history: any[] }) {
                     </span>
                     <span className="text-xs opacity-30 shrink-0">|</span>
                     <span className="text-xs font-mono opacity-60 tracking-wider">
-                      {new Date(h.created_at).toLocaleDateString("en-GB", {
-                        day: "2-digit", month: "2-digit", year: "numeric"
-                      })}
+                      {formatSafeDate(h.created_at)}
                     </span>
                   </div>
                 </SelectItem>
@@ -134,7 +146,6 @@ export function InsightsDashboard({ history }: { history: any[] }) {
                 <Activity className="text-primary h-5 w-5" />
               </div>
               <div className="flex-1 min-h-0">
-                {/* ✨ FIX: We now check the flat database columns directly */}
                 {(activePrediction.gwp_total || activePrediction.results) ? (
                   <ValueRadar data={activePrediction} maxValues={maxValues} simulation={simulateRenewable} />
                 ) : (
@@ -155,7 +166,6 @@ export function InsightsDashboard({ history }: { history: any[] }) {
                 <div className="px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-[10px] font-black text-primary">LIVE FLOW</div>
               </div>
               <div className="flex-1 min-h-0">
-                {/* ✨ FIX: Checks flat column first, then nested visualisations, then falls back to empty */}
                 <SankeyChart data={activePrediction.sankey_data || activePrediction.visualizations?.sankey_data || { nodes: [], links: [] }} />
               </div>
             </GlowingCard>
