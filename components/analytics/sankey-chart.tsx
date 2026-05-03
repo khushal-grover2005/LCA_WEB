@@ -17,14 +17,13 @@ const CYBER_THEME_COLORS = [
 export function SankeyChart({ data }: { data: any }) {
   const containerRef = useRef<HTMLDivElement>(null)
 
-  // Premium entry animation
   useEffect(() => {
     if (!data || !data.nodes || data.nodes.length === 0) return;
 
     const ctx = gsap.context(() => {
       gsap.fromTo("path", 
         { opacity: 0 },
-        { opacity: 0.5, duration: 1.5, stagger: 0.1, ease: "power2.out" }
+        { opacity: 0.35, duration: 1.5, stagger: 0.1, ease: "power2.out" }
       )
       gsap.from("rect", { 
         scaleY: 0, 
@@ -47,38 +46,36 @@ export function SankeyChart({ data }: { data: any }) {
   }
 
   return (
-    <div ref={containerRef} className="h-full w-full relative -mt-4">
+    <div ref={containerRef} className="h-full w-full relative">
       <ResponsiveSankey
         data={data}
-        // ✨ FIX 1: We can shrink the side margins now because the text is inside!
-        margin={{ top: 40, right: 40, bottom: 40, left: 40 }}
+        // ✨ Since the text is locked inside, we can reduce outer margins so the chart fills the whole card!
+        margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
         align="justify"
         colors={CYBER_THEME_COLORS}
         nodeOpacity={1}
-        // ✨ FIX 2: Made the nodes much thicker (32px) so they act as pillars for the text
-        nodeThickness={32} 
+        nodeThickness={48} // ✨ Thickened the pillars to comfortably hold the text
         nodeInnerPadding={3}
         nodeSpacing={24} 
         nodeBorderWidth={0}
-        nodeBorderRadius={4}
+        nodeBorderRadius={6}
         linkOpacity={0.35}
         linkHoverOthersOpacity={0.05}
         linkHoverOpacity={0.8}
         enableLinkGradient={true}
-        // ✨ FIX 3: Rotated the text vertically and moved it inside the pillars
         labelPosition="inside"
-        labelOrientation="vertical"
-        labelPadding={16}
+        
+        // Keeping the glassmorphic tooltips intact
         theme={{
-          labels: { 
-            text: { 
-              fontSize: 12, 
-              fontWeight: 900, 
-              textTransform: 'uppercase', 
-              letterSpacing: '0.2em', // Added extra spacing for sleek vertical reading
-              fill: "#FFFFFF", // Crisp white
-              textShadow: "0px 2px 8px rgba(0,0,0,0.9)" // Heavy shadow so it pops off the colored pillars
-            } 
+          labels: {
+            text: {
+              fill: '#FFFFFF',
+              fontSize: 13,
+              fontWeight: 900,
+              fontFamily: 'var(--font-jetbrains), monospace',
+              letterSpacing: '0.15em',
+              textShadow: '0px 2px 10px rgba(0,0,0,0.8)',
+            }
           },
           tooltip: { 
             container: { 
