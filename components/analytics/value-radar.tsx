@@ -1,26 +1,34 @@
 "use client"
+
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from "recharts"
 
 export function ValueRadar({ data, maxValues, simulation }: any) {
-  const gwp = simulation ? data.results.gwp_total * 0.4 : data.results.gwp_total
+  // ✨ FIX: Safely extract values whether they are nested (live) or flat (database)
+  const rawGwp = data?.results?.gwp_total ?? data?.gwp_total ?? 0;
+  const circularity = data?.results?.circularity_index ?? data?.circularity_index ?? 0;
+  const recycled = data?.technical_profile?.recycled_content_pct ?? data?.recycled_content_est ?? 0;
+
+  const gwp = simulation ? rawGwp * 0.4 : rawGwp;
+  const safeMaxGwp = maxValues?.gwp || 1; // Prevent division by zero
 
   const plotData = [
     { 
       metric: "GWP", 
-      val: (1 - (gwp / maxValues.gwp)) * 100,
+      // ✨ FIX: Fallback to 0 if NaN, invert so lower GWP = higher score on radar
+      val: Math.max(0, (1 - (gwp / safeMaxGwp)) * 100) || 0, 
       full: gwp.toFixed(2),
       unit: " kg"
     },
     { 
       metric: "Circularity", 
-      val: data.results.circularity_index, 
-      full: data.results.circularity_index.toFixed(1),
+      val: circularity || 0, 
+      full: (circularity || 0).toFixed(1),
       unit: ""
     },
     { 
       metric: "Recycled %", 
-      val: data.technical_profile?.recycled_content_pct || 0, 
-      full: (data.technical_profile?.recycled_content_pct || 0).toFixed(1),
+      val: recycled || 0, 
+      full: (recycled || 0).toFixed(1),
       unit: "%"
     }
   ]

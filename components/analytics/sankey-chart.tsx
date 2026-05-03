@@ -8,6 +8,8 @@ export function SankeyChart({ data }: { data: any }) {
   const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    if (!data || !data.nodes || data.nodes.length === 0) return;
+
     const ctx = gsap.context(() => {
       // Custom Path Morphing Effect: Animating stroke-dash for "flow" look
       gsap.fromTo("path", 
@@ -34,6 +36,15 @@ export function SankeyChart({ data }: { data: any }) {
 
     return () => ctx.revert()
   }, [data])
+
+  // ✨ FIX: Prevent Nivo from silently crashing/hiding when data is empty
+  if (!data || !data.nodes || data.nodes.length === 0) {
+    return (
+      <div className="h-full w-full flex items-center justify-center text-muted-foreground text-sm italic border-2 border-dashed border-border/10 rounded-xl">
+        No supply chain flow data available for this record.
+      </div>
+    )
+  }
 
   return (
     <div ref={containerRef} className="h-full w-full">
