@@ -2,35 +2,8 @@
 
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from "recharts"
 
-function CustomTick({ payload, x, y }: any) {
-  let dx = 0;
-  let dy = 0;
-
-  if (payload.value === "GWP") dy = 10;
-  if (payload.value.includes("Recycled")) dx = 28;
-  if (payload.value === "Circularity") dx = -28;
-
-  return (
-    <text
-      x={x}
-      y={y}
-      dx={dx}
-      dy={dy}
-      textAnchor="middle"
-      fill="#F8FAFC"
-      fontSize={12}
-      fontWeight={700}
-      textTransform="uppercase"
-      letterSpacing="0.05em"
-      style={{ textShadow: "0px 4px 10px rgba(0,0,0,0.5)" }}
-    >
-      {payload.value}
-    </text>
-  );
-}
-
 export function ValueRadar({ data, maxValues, simulation }: any) {
-  // 1. Aggressively extract raw values (searches root, results object, AND response object)
+  // 1. Aggressively extract raw values
   const rawGwp = Number(data?.results?.gwp_total ?? data?.gwp_total ?? data?.response?.results?.gwp_total ?? 0);
   const circularity = Number(data?.results?.circularity_index ?? data?.circularity_index ?? data?.response?.results?.circularity_index ?? 0);
   const recycled = Number(data?.technical_profile?.recycled_content_pct ?? data?.recycled_content_est ?? data?.response?.technical_profile?.recycled_content_pct ?? 0);
@@ -44,26 +17,58 @@ export function ValueRadar({ data, maxValues, simulation }: any) {
     { 
       metric: "GWP", 
       val: isNaN(gwpScore) ? 0 : gwpScore, 
-      full: isNaN(gwp) ? "0.00" : gwp.toFixed(2), // The REAL database number
+      full: isNaN(gwp) ? "0.00" : gwp.toFixed(2), 
       unit: " kg CO₂"
     },
     { 
       metric: "Circularity", 
       val: isNaN(circularity) ? 0 : circularity, 
-      full: isNaN(circularity) ? "0.0" : circularity.toFixed(1), // The REAL database number
+      full: isNaN(circularity) ? "0.0" : circularity.toFixed(1), 
       unit: " / 100"
     },
     { 
       metric: "Recycled %", 
       val: isNaN(recycled) ? 0 : recycled, 
-      full: isNaN(recycled) ? "0.0" : recycled.toFixed(1), // The REAL database number
+      full: isNaN(recycled) ? "0.0" : recycled.toFixed(1), 
       unit: "%"
     }
   ]
 
-  const dynamicVisibleColor = circularity > 70 ? "#10B981" : circularity > 50 ? "#F59E0B" : "#F43F5E"; 
+  // ✨ UPGRADE: True Neon Hex Codes for maximum vibrancy
+  const dynamicVisibleColor = circularity > 70 ? "#00FFA3" : circularity > 50 ? "#FFB000" : "#FF0055"; 
 
-  // ✨ THE FIX: Custom Tooltip that displays the REAL `full` number, ignoring the `val` coordinate
+  // ✨ UPGRADE: CustomTick moved inside so it can use dynamicVisibleColor for the text and glow!
+  const CustomTick = ({ payload, x, y }: any) => {
+    let dx = 0;
+    let dy = 0;
+
+    if (payload.value === "GWP") dy = 10;
+    if (payload.value.includes("Recycled")) dx = 28;
+    if (payload.value === "Circularity") dx = -28;
+
+    return (
+      <text
+        x={x}
+        y={y}
+        dx={dx}
+        dy={dy}
+        textAnchor="middle"
+        fill={dynamicVisibleColor} // Text is now vibrant
+        fontSize={13}
+        fontWeight={800} // Extra bold
+        textTransform="uppercase"
+        letterSpacing="0.05em"
+        style={{ 
+          // Text casts its own colored glow
+          textShadow: `0px 0px 15px ${dynamicVisibleColor}80, 0px 0px 30px ${dynamicVisibleColor}40`,
+          filter: "brightness(1.2)"
+        }}
+      >
+        {payload.value}
+      </text>
+    );
+  };
+
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const point = payload[0].payload;
@@ -73,7 +78,7 @@ export function ValueRadar({ data, maxValues, simulation }: any) {
           style={{ 
             backgroundColor: 'rgba(15, 23, 42, 0.95)', 
             border: `1px solid ${dynamicVisibleColor}`,
-            boxShadow: `0 0 30px ${dynamicVisibleColor}40`
+            boxShadow: `0 0 30px ${dynamicVisibleColor}60` // Stronger tooltip glow
           }}
         >
           <p className="text-[#F8FAFC] font-bold text-[10px] uppercase tracking-[0.2em] mb-1 opacity-70">
@@ -99,16 +104,22 @@ export function ValueRadar({ data, maxValues, simulation }: any) {
       >
         <defs>
           <linearGradient id="radarGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor={dynamicVisibleColor} stopOpacity={0.9} />
-            <stop offset="95%" stopColor={dynamicVisibleColor} stopOpacity={0.1} />
+            <stop offset="0%" stopColor={dynamicVisibleColor} stopOpacity={0.95} />
+            <stop offset="100%" stopColor={dynamicVisibleColor} stopOpacity={0.15} />
           </linearGradient>
-          <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="6" result="blur" />
+          <filter id="neonGlow" x="-30%" y="-30%" width="160%" height="160%">
+            {/* Boosted the blur radius for a wider, softer glow */}
+            <feGaussianBlur stdDeviation="8" result="blur" />
             <feComposite in="SourceGraphic" in2="blur" operator="over" />
           </filter>
         </defs>
 
-        <PolarGrid stroke="rgba(255, 255, 255, 0.2)" strokeDasharray="3 3" />
+        {/* ✨ UPGRADE: The spider web itself is now tinted with the dynamic color and highly visible */}
+        <PolarGrid 
+          stroke={dynamicVisibleColor} 
+          strokeOpacity={0.35} // Just enough to make the web pop without overpowering the fill
+          strokeDasharray="4 4" 
+        />
         
         <PolarAngleAxis 
             dataKey="metric" 
@@ -121,14 +132,13 @@ export function ValueRadar({ data, maxValues, simulation }: any) {
           name="Metal Score"
           dataKey="val"
           stroke={dynamicVisibleColor}
-          strokeWidth={3} 
+          strokeWidth={4} // Even thicker bounding line
           fill="url(#radarGradient)" 
           filter="url(#neonGlow)" 
           isAnimationActive={true}
           animationDuration={1500}
         />
         
-        {/* Triggering the Custom Tooltip */}
         <Tooltip content={<CustomTooltip />} cursor={false} />
       </RadarChart>
     </ResponsiveContainer>
