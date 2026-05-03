@@ -3,32 +3,35 @@
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from "recharts"
 
 export function ValueRadar({ data, maxValues, simulation }: any) {
-  // ✨ FIX: Safely extract values whether they are nested (live) or flat (database)
-  const rawGwp = data?.results?.gwp_total ?? data?.gwp_total ?? 0;
-  const circularity = data?.results?.circularity_index ?? data?.circularity_index ?? 0;
-  const recycled = data?.technical_profile?.recycled_content_pct ?? data?.recycled_content_est ?? 0;
+  // 1. Aggressively extract values, checking both nested and flattened database shapes
+  const rawGwp = Number(data?.results?.gwp_total ?? data?.gwp_total ?? 0);
+  const circularity = Number(data?.results?.circularity_index ?? data?.circularity_index ?? 0);
+  const recycled = Number(data?.technical_profile?.recycled_content_pct ?? data?.recycled_content_est ?? 0);
 
+  // 2. Safely calculate percentages
   const gwp = simulation ? rawGwp * 0.4 : rawGwp;
-  const safeMaxGwp = maxValues?.gwp || 1; // Prevent division by zero
+  const safeMaxGwp = Number(maxValues?.gwp) || 1; // Prevent division by zero
+  
+  // 3. Fallback to 0 if NaN, invert so lower GWP = higher score
+  const gwpScore = Math.max(0, (1 - (gwp / safeMaxGwp)) * 100);
 
   const plotData = [
     { 
       metric: "GWP", 
-      // ✨ FIX: Fallback to 0 if NaN, invert so lower GWP = higher score on radar
-      val: Math.max(0, (1 - (gwp / safeMaxGwp)) * 100) || 0, 
-      full: gwp.toFixed(2),
+      val: isNaN(gwpScore) ? 0 : gwpScore, 
+      full: isNaN(gwp) ? "0.00" : gwp.toFixed(2),
       unit: " kg"
     },
     { 
       metric: "Circularity", 
-      val: circularity || 0, 
-      full: (circularity || 0).toFixed(1),
+      val: isNaN(circularity) ? 0 : circularity, 
+      full: isNaN(circularity) ? "0.0" : circularity.toFixed(1),
       unit: ""
     },
     { 
       metric: "Recycled %", 
-      val: recycled || 0, 
-      full: (recycled || 0).toFixed(1),
+      val: isNaN(recycled) ? 0 : recycled, 
+      full: isNaN(recycled) ? "0.0" : recycled.toFixed(1),
       unit: "%"
     }
   ]

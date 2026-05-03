@@ -8,12 +8,12 @@ import { GlowingCard } from "@/components/ui/glowing-card"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-const SankeyChart = dynamic(() => import("./sankey-chart").then((mod: any) => mod.SankeyChart || mod.default), { 
+const SankeyChart = dynamic(() => import("./sankey-chart").then(mod => mod.SankeyChart), { 
   ssr: false,
   loading: () => <div className="h-[350px] w-full flex items-center justify-center animate-pulse bg-muted/10 rounded-xl text-muted-foreground text-sm font-mono">Loading Flow...</div>
 })
 
-const ValueRadar = dynamic(() => import("./value-radar").then((mod: any) => mod.ValueRadar || mod.default), { 
+const ValueRadar = dynamic(() => import("./value-radar").then(mod => mod.ValueRadar), { 
   ssr: false,
   loading: () => <div className="h-[350px] w-full flex items-center justify-center animate-pulse bg-muted/10 rounded-xl text-muted-foreground text-sm font-mono">Loading Radar...</div>
 })
@@ -29,11 +29,11 @@ class ChartErrorBoundary extends React.Component<{children: React.ReactNode}, {h
   render() {
     if (this.state.hasError) {
       return (
-        <div className="flex flex-col items-center justify-center p-6 bg-destructive/10 text-destructive rounded-xl h-full min-h-[300px] border border-destructive/20 text-center">
+        <div className="flex flex-col items-center justify-center p-6 bg-destructive/10 text-destructive rounded-xl h-full min-h-[350px] border border-destructive/20 text-center">
           <AlertCircle className="h-8 w-8 mb-2" />
           <p className="font-bold text-sm">Chart Component Crashed</p>
           <code className="text-[10px] mt-2 p-2 bg-destructive/20 rounded max-w-full overflow-x-auto text-left">
-            {this.state.error?.message || "Unknown rendering error."}
+            {this.state.error?.message || "Unknown error."}
           </code>
         </div>
       );
@@ -52,19 +52,14 @@ const formatSafeDate = (isoString: string) => {
   }
 }
 
-// ✨ PRO FIX: A robust function to dig out the Sankey data no matter how Supabase nested it.
+// Bruteforce Sankey extractor
 const extractSankeyData = (prediction: any) => {
-  if (!prediction) return { nodes: [], links: [] };
-  
-  // It might be flat, it might be nested in visualizations, OR it might be nested inside a 'response' object
+  if (!prediction) return null;
   let rawViz = prediction.visualizations || prediction.response?.visualizations || prediction.sankey_data;
-  
-  // If Supabase saved it as a raw string, parse it
   if (typeof rawViz === 'string') {
     try { rawViz = JSON.parse(rawViz); } catch(e) {}
   }
-  
-  return rawViz?.sankey_data || rawViz || { nodes: [], links: [] };
+  return rawViz?.sankey_data || rawViz || null;
 }
 
 export function InsightsDashboard({ history }: { history: any[] }) {
@@ -77,20 +72,7 @@ export function InsightsDashboard({ history }: { history: any[] }) {
 
   const activePrediction = useMemo(() => {
     if (!Array.isArray(history)) return null;
-    const rawData = history.find(p => p?.id === selectedId);
-    if (!rawData) return null;
-
-    // We check `rawData.response.results` in case you saved the entire API response inside a `response` column
-    return {
-      ...rawData,
-      results: rawData.results || rawData.response?.results || {
-        gwp_total: rawData.gwp_total || 0,
-        circularity_index: rawData.circularity_index || 0,
-        resource_efficiency: rawData.resource_efficiency || 0,
-        recycled_content_est: rawData.recycled_content_est || 0,
-      },
-      technical_profile: rawData.technical_profile || rawData.response?.technical_profile || {}
-    }
+    return history.find(p => p?.id === selectedId) || null;
   }, [selectedId, history])
 
   const maxValues = useMemo(() => {
@@ -195,10 +177,8 @@ export function InsightsDashboard({ history }: { history: any[] }) {
                 </div>
                 <Activity className="text-primary h-5 w-5" />
               </div>
-              {/* ✨ PRO FIX: Forced h-[350px] directly on the wrapper so Recharts cannot collapse */}
-              <div className="flex-1 w-full h-[350px] relative">
+              <div className="flex-1 w-full min-h-[350px] h-[350px] relative">
                 <ChartErrorBoundary>
-                  {/* @ts-ignore */}
                   <ValueRadar data={activePrediction} maxValues={maxValues} simulation={simulateRenewable} />
                 </ChartErrorBoundary>
               </div>
@@ -215,10 +195,8 @@ export function InsightsDashboard({ history }: { history: any[] }) {
                 </div>
                 <div className="px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-[10px] font-black text-primary">LIVE FLOW</div>
               </div>
-              {/* ✨ PRO FIX: Forced h-[350px] directly on the wrapper so Nivo cannot collapse */}
-              <div className="flex-1 w-full h-[350px] relative">
+              <div className="flex-1 w-full min-h-[350px] h-[350px] relative">
                 <ChartErrorBoundary>
-                  {/* @ts-ignore */}
                   <SankeyChart data={extractSankeyData(activePrediction)} />
                 </ChartErrorBoundary>
               </div>

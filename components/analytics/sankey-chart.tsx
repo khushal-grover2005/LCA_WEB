@@ -11,33 +11,17 @@ export function SankeyChart({ data }: { data: any }) {
     if (!data || !data.nodes || data.nodes.length === 0) return;
 
     const ctx = gsap.context(() => {
-      // Custom Path Morphing Effect: Animating stroke-dash for "flow" look
       gsap.fromTo("path", 
         { strokeDasharray: "10,10", strokeDashoffset: 100, opacity: 0 },
-        { 
-          strokeDashoffset: 0, 
-          opacity: 0.6, 
-          duration: 3, 
-          stagger: 0.05, 
-          ease: "none",
-          repeat: -1
-        }
+        { strokeDashoffset: 0, opacity: 0.6, duration: 3, stagger: 0.05, ease: "none", repeat: -1 }
       )
-      
-      // Node entrance
-      gsap.from("rect", {
-        scaleY: 0,
-        transformOrigin: "bottom",
-        duration: 1,
-        stagger: 0.02,
-        ease: "expo.out"
-      })
+      gsap.from("rect", { scaleY: 0, transformOrigin: "bottom", duration: 1, stagger: 0.02, ease: "expo.out" })
     }, containerRef)
 
     return () => ctx.revert()
   }, [data])
 
-  // ✨ FIX: Prevent Nivo from silently crashing/hiding when data is empty
+  // If no data, show message instead of crashing
   if (!data || !data.nodes || data.nodes.length === 0) {
     return (
       <div className="h-full w-full flex items-center justify-center text-muted-foreground text-sm italic border-2 border-dashed border-border/10 rounded-xl">
