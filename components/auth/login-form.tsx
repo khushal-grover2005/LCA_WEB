@@ -81,6 +81,8 @@ export function LoginForm() {
   return (
     <div className="flex flex-col gap-6">
       <form onSubmit={onSubmit} className="flex flex-col gap-4">
+        
+        {/* Email Field */}
         <div className="flex flex-col gap-2">
           <Label htmlFor="email">Email</Label>
           <Input
@@ -93,16 +95,10 @@ export function LoginForm() {
             placeholder="you@example.com"
           />
         </div>
+
+        {/* Password Field */}
         <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="password">Password</Label>
-            <Link
-              href="/auth/login"
-              className="text-xs text-muted-foreground hover:text-foreground"
-            >
-              Forgot?
-            </Link>
-          </div>
+          <Label htmlFor="password">Password</Label>
           <Input
             id="password"
             type="password"
@@ -111,12 +107,23 @@ export function LoginForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+          {/* ✨ MOVED: Forgot Password Link is now below the input */}
+          <div className="flex justify-end mt-1">
+            <Link
+              href="/forgot-password"
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Forgot your password?
+            </Link>
+          </div>
         </div>
+
         {error && (
           <p className="text-sm text-destructive" role="alert">
             {error}
           </p>
         )}
+        
         <Button type="submit" disabled={loading || googleLoading || !email || !password}>
           {loading ? (
             <>
