@@ -91,7 +91,7 @@
     color: var(--foreground);
   }
 
-  /* ✨ BULLETPROOF AUTOFILL FIX FOR DARK MODE ✨ */
+  /* ✨ PURE TRANSPARENT AUTOFILL FIX ✨ */
   input:-webkit-autofill,
   input:-webkit-autofill:hover, 
   input:-webkit-autofill:focus, 
@@ -102,9 +102,10 @@
   select:-webkit-autofill,
   select:-webkit-autofill:hover,
   select:-webkit-autofill:focus {
-    -webkit-box-shadow: 0 0 0px 1000px #131824 inset !important;
-    -webkit-text-fill-color: #f1f5f9 !important;
-    transition: background-color 5000s ease-in-out 0s;
+    /* Delay the background and text color change for 5000 seconds */
+    transition: background-color 5000s ease-in-out 0s, color 5000s ease-in-out 0s !important;
+    -webkit-text-fill-color: var(--foreground) !important;
+    background-color: transparent !important;
     caret-color: white !important;
   }
 }
