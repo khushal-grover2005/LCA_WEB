@@ -52,7 +52,7 @@ const formatSafeDate = (isoString: string) => {
   }
 }
 
-// 🧨 The "God Mode" Extractor & Sanitizer
+// 🌟 UPGRADED SANITIZER: Translates Python's structure into Nivo's structure
 const extractSankeyData = (prediction: any) => {
   if (!prediction) return null;
 
@@ -86,19 +86,35 @@ const extractSankeyData = (prediction: any) => {
 
   if (!rawData || !rawData.nodes || !rawData.links) return null;
 
-  // Sanitizer: Forces Nivo to accept the data and drops broken links
+  // Converts indices to IDs and ensures nodes have the exact format Nivo expects
   try {
-    const validNodeIds = new Set(rawData.nodes.map((n: any) => String(n.id).trim()));
+    const normalizedNodes = rawData.nodes.map((n: any, idx: number) => ({
+      ...n,
+      id: String(n.id || n.name || idx).trim()
+    }));
+
+    const validNodeIds = new Set(normalizedNodes.map((n: any) => n.id));
+
     const cleanLinks = rawData.links
-      .map((link: any) => ({
-        source: String(link.source).trim(),
-        target: String(link.target).trim(),
-        value: Number(link.value) || 1
-      }))
+      .map((link: any) => {
+        const sourceId = typeof link.source === 'number' 
+          ? normalizedNodes[link.source]?.id 
+          : String(link.source).trim();
+          
+        const targetId = typeof link.target === 'number' 
+          ? normalizedNodes[link.target]?.id 
+          : String(link.target).trim();
+
+        return {
+          source: sourceId,
+          target: targetId,
+          value: Number(link.value) || 1
+        };
+      })
       .filter((link: any) => validNodeIds.has(link.source) && validNodeIds.has(link.target));
 
     if (cleanLinks.length === 0) return null;
-    return { nodes: rawData.nodes, links: cleanLinks };
+    return { nodes: normalizedNodes, links: cleanLinks };
   } catch (error) {
     return null;
   }
@@ -135,7 +151,7 @@ export function InsightsDashboard({ history }: { history: any[] }) {
     }, 100)
   }
 
-  // ⚡ GSAP Performance Fix (Uses requestAnimationFrame)
+  // ⚡ GSAP Performance Fix
   useEffect(() => {
     if (!isAnalyzed || !activePrediction) return;
 
@@ -233,7 +249,7 @@ export function InsightsDashboard({ history }: { history: any[] }) {
             </GlowingCard>
           </div>
 
-          {/* Sankey Supply Chain with Fallback Data injection */}
+          {/* Sankey Supply Chain */}
           <div className="viz-card lg:col-span-8 min-h-[500px]">
             <GlowingCard className="h-full p-8 flex flex-col border-border/50 bg-card/60 backdrop-blur-md">
               <div className="flex justify-between items-start mb-8">
@@ -247,11 +263,10 @@ export function InsightsDashboard({ history }: { history: any[] }) {
                 <ChartErrorBoundary>
                   <SankeyChart 
                     data={extractSankeyData(activePrediction) || {
-                      // ✨ BUG FIX: Safe, non-looping fallback data
                       nodes: [
                         { id: "Mining" }, { id: "Processing" }, { id: "Manufacturing" },
                         { id: "Use Phase" }, { id: "End of Life" }, { id: "Recycling" },
-                        { id: "Secondary Market" } // Added endpoint to break the loop
+                        { id: "Secondary Market" }
                       ],
                       links: [
                         { source: "Mining", target: "Processing", value: 80 },
@@ -259,7 +274,7 @@ export function InsightsDashboard({ history }: { history: any[] }) {
                         { source: "Manufacturing", target: "Use Phase", value: 70 },
                         { source: "Use Phase", target: "End of Life", value: 65 },
                         { source: "End of Life", target: "Recycling", value: 40 },
-                        { source: "Recycling", target: "Secondary Market", value: 35 } // Flow ends here safely
+                        { source: "Recycling", target: "Secondary Market", value: 35 }
                       ]
                     }} 
                   />
