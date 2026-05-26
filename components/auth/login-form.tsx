@@ -110,7 +110,7 @@ export function LoginForm() {
           {/* ✨ MOVED: Forgot Password Link is now below the input */}
           <div className="flex justify-end mt-1">
             <Link
-              href="/forgot-password"
+              href="/auth/forgot-password"
               className="text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
               Forgot your password?
