@@ -51,8 +51,7 @@ export function SankeyChart({ data }: { data: any }) {
     <div ref={containerRef} className="h-full w-full relative">
       <ResponsiveSankey
         data={data}
-        // ✨ THE FINAL FIX: 130px left/right margins provide a "safe zone" 
-        // for wide tooltips to render without hitting the card's overflow boundary.
+        // ✨ Margins preserved exactly as they were
         margin={{ top: 30, right: 130, bottom: 30, left: 130 }}
         align="justify"
         colors={CYBER_THEME_COLORS}
@@ -69,6 +68,38 @@ export function SankeyChart({ data }: { data: any }) {
         
         // Disable default labels to prevent horizontal clashing
         enableLabels={false}
+
+        // ✨ 1. NEW CUSTOM NODE TOOLTIP (Solid Blocks)
+        nodeTooltip={({ node }: any) => (
+          <div 
+            className="bg-[#09090b]/95 text-[#F8FAFC] px-3 py-2 rounded-xl shadow-[0_20px_40px_rgba(0,0,0,0.5)] backdrop-blur-md flex flex-col items-center justify-center text-center z-50"
+            style={{ border: `1px solid ${node.color}`, maxWidth: '140px' }}
+          >
+            <span style={{ color: node.color }} className="text-[11px] font-black uppercase tracking-wider leading-snug break-words text-wrap">
+              {node.id}
+            </span>
+            <span className="text-[11px] font-mono text-[#F8FAFC]/70 mt-1">
+              {node.value} kg CO₂
+            </span>
+          </div>
+        )}
+
+        // ✨ 2. NEW CUSTOM LINK TOOLTIP (Flow Area)
+        linkTooltip={({ link }: any) => (
+          <div 
+            className="bg-[#09090b]/95 text-[#F8FAFC] border border-[#FF6B00]/50 px-3 py-2.5 rounded-xl shadow-[0_20px_40px_rgba(255,107,0,0.15)] backdrop-blur-md flex flex-col items-center justify-center text-center z-50"
+            style={{ maxWidth: '150px' }}
+          >
+            <div className="flex flex-col items-center gap-0.5 text-[10px] font-black uppercase tracking-wider leading-snug opacity-80 text-wrap break-words">
+              <span>{link.source.id}</span>
+              <span className="text-[#FF6B00] text-lg leading-none py-0.5">↓</span>
+              <span>{link.target.id}</span>
+            </div>
+            <span className="text-[11px] font-mono text-[#FF6B00] font-bold mt-1.5 border-t border-[#FF6B00]/30 pt-1.5 w-full">
+              {link.value} kg CO₂
+            </span>
+          </div>
+        )}
 
         // CUSTOM NODE RENDERER: Forces vertical, centered white text inside pillars
         node={(nodeProps: any) => {
@@ -102,21 +133,8 @@ export function SankeyChart({ data }: { data: any }) {
           )
         }}
 
-        theme={{
-          tooltip: { 
-            container: { 
-              background: 'rgba(9, 9, 11, 0.95)', 
-              color: '#F8FAFC', 
-              borderRadius: '12px', 
-              border: '1px solid #FF6B00', 
-              boxShadow: '0 20px 40px rgba(255,107,0,0.15)',
-              fontSize: '11px',
-              fontWeight: 800,
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em'
-            } 
-          }
-        }}
+        // An empty theme object to override Nivo's default tooltip styling interference
+        theme={{}}
       />
     </div>
   )
