@@ -4,5 +4,11 @@
   "outputDirectory": ".next",
   "rewrites": [
     { "source": "/(.*)", "destination": "/$1" }
+  ],
+  "crons": [
+    {
+      "path": "/api/predictions",
+      "schedule": "0 0 * * 0" 
+    }
   ]
 }
