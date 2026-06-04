@@ -5,8 +5,8 @@ import { Bot, User, Send, BarChart3, Target, Lightbulb, ShieldAlert } from "luci
 import { GlowingCard } from "@/components/ui/glowing-card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useChat } from "ai/react"
-  
+import { useChat } from "@ai-sdk/react"
+
 const QUICK_ACTIONS = [
   {
     id: "stats",
