@@ -1,11 +1,10 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState, FormEvent } from "react"
 import { Bot, User, Send, BarChart3, Target, Lightbulb, ShieldAlert } from "lucide-react"
 import { GlowingCard } from "@/components/ui/glowing-card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useChat } from "@ai-sdk/react"
 
 const QUICK_ACTIONS = [
   {
@@ -31,17 +30,81 @@ const QUICK_ACTIONS = [
   }
 ]
 
+// Define a type for our messages to keep TypeScript happy
+type Message = {
+  id: string;
+  role: string;
+  content: string;
+}
+
 export default function ChatbotPage() {
-  // Automatically connects to your /api/chat route
-  const { messages, input, handleInputChange, handleSubmit, isLoading, append } = useChat()
+  // 1. Native State Management (Zero Dependency on AI SDK)
+  const [messages, setMessages] = useState<Message[]>([])
+  const [input, setInput] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  // Auto-scroll to the newest message
+  // 2. Auto-scroll to the newest message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
 
-  // Triggers when a user clicks a menu card
+  // 3. Custom Streaming Pipeline
+  const append = async (newMessage: { role: string, content: string }) => {
+    const userMessage = { id: Date.now().toString(), role: newMessage.role, content: newMessage.content }
+    const updatedMessages = [...messages, userMessage]
+    
+    setMessages(updatedMessages)
+    setIsLoading(true)
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: updatedMessages }),
+      })
+
+      if (!response.body) throw new Error('No response body')
+
+      // Prepare empty assistant message to hold the incoming stream
+      const assistantMessageId = (Date.now() + 1).toString()
+      setMessages(prev => [...prev, { id: assistantMessageId, role: 'assistant', content: '' }])
+
+      // Native Text Decoder for Real-Time Streaming
+      const reader = response.body.getReader()
+      const decoder = new TextDecoder()
+      let assistantText = ""
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        
+        assistantText += decoder.decode(value, { stream: true })
+        
+        // Update the UI in real-time frame by frame
+        setMessages(prev => {
+          const newMsgList = [...prev]
+          newMsgList[newMsgList.length - 1].content = assistantText
+          return newMsgList
+        })
+      }
+    } catch (error) {
+      console.error("Streaming error:", error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // 4. Form Submission Handler
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault()
+    if (!input.trim() || isLoading) return
+    const text = input
+    setInput("") // Clear input field immediately
+    append({ role: 'user', content: text })
+  }
+
+  // 5. Quick Action Handler
   const handleQuickAction = (promptText: string) => {
     append({ role: 'user', content: promptText })
   }
@@ -110,7 +173,7 @@ export default function ChatbotPage() {
             )}
 
             {/* Dynamic Chat Messages */}
-            {messages.map((m: any) => (
+            {messages.map((m) => (
               <div key={m.id} className={`flex gap-3 ${m.role === 'user' ? 'flex-row-reverse' : ''}`}>
                 <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ring-1 ${
                   m.role === 'user' 
@@ -154,7 +217,7 @@ export default function ChatbotPage() {
             <form onSubmit={handleSubmit} className="flex gap-3">
               <Input
                 value={input}
-                onChange={handleInputChange}
+                onChange={(e) => setInput(e.target.value)}
                 placeholder="Or ask a specific question about your LCA data..."
                 className="flex-1 bg-background border-border/50 h-12 focus-visible:ring-copper rounded-xl shadow-inner"
                 disabled={isLoading}
