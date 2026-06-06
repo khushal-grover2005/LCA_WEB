@@ -85,14 +85,14 @@ export async function POST(req: Request) {
     `;
 
     // 5. STREAM WITH ENHANCED RELIABILITY
-    console.log(`[${requestId}] About to call streamText with model: llama-3.1-70b-versatile`);
+    console.log(`[${requestId}] About to call streamText with model: mixtral-8x7b-32768`);
     console.log(`[${requestId}] System prompt length: ${systemPrompt.length}`);
     console.log(`[${requestId}] Messages count: ${messages.length}`);
 
     let result;
     try {
       result = await streamText({
-        model: groq('llama-3.1-70b-versatile'), 
+        model: groq('mixtral-8x7b-32768'), 
         system: systemPrompt,
         messages: messages.map((m: any) => ({
           role: m.role,
