@@ -16,14 +16,7 @@ const LINKS = [
   { href: "/chat", label: "Chat" },
 ]
 
-// 🌟 ADDED: The isGlobal prop to determine if this is the "real" navbar
-export function SiteNav({ isGlobal = false }: { isGlobal?: boolean }) {
-  
-  // 🛑 THE ANTI-CLONE PROTOCOL 🛑
-  // If this component was called from an individual page file without the isGlobal flag,
-  // it instantly returns null and renders nothing, preventing the flicker!
-  if (!isGlobal) return null;
-
+export function SiteNav() {
   const pathname = usePathname()
   const router = useRouter()
   const [email, setEmail] = useState<string | null>(null)
@@ -146,8 +139,10 @@ export function SiteNav({ isGlobal = false }: { isGlobal?: boolean }) {
 
         {/* MOBILE OVERLAY */}
         {mobileMenuOpen && (
+          // ✨ FIX: Swapped 100vh for 100dvh so it dynamically accounts for the Safari URL bar
           <div className="fixed inset-0 top-16 z-[105] h-[calc(100dvh-64px)] w-full bg-background lg:hidden animate-in fade-in slide-in-from-top-4 duration-200 overflow-y-auto">
             
+            {/* ✨ FIX: Increased pb-12 to pb-32 to guarantee scroll clearance over the browser UI */}
             <nav className="flex flex-col p-6 gap-4 min-h-full pb-32">
               {LINKS.map((link) => (
                 <Link
