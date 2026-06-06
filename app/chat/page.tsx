@@ -1,5 +1,5 @@
 "use client"
-
+import { SiteNav } from "@/components/site-nav"
 import { useEffect, useRef, useState, FormEvent } from "react"
 import { Bot, User, Send, BarChart3, Target, Lightbulb, ShieldAlert } from "lucide-react"
 import { GlowingCard } from "@/components/ui/glowing-card"
