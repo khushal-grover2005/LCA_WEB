@@ -1,11 +1,22 @@
-import { groq } from '@ai-sdk/groq';
 import { streamText } from 'ai';
 import { createClient } from '@/lib/supabase/server'; 
+import { createGroq } from '@ai-sdk/groq';
+
+// Force initialization with the explicit environment variable
+const groq = createGroq({
+  apiKey: process.env.GROQ_API_KEY || '', 
+});
 
 export const maxDuration = 30;
 
 export async function POST(req: Request) {
   try {
+    // 🚨 THE TRIPWIRE: This forces Vercel to log exactly what it sees
+    if (!process.env.GROQ_API_KEY) {
+      console.error("FATAL ERROR: GROQ_API_KEY is totally missing from this Vercel environment!");
+      return new Response(JSON.stringify({ error: "Server Configuration Error: Missing API Key in Vercel" }), { status: 500 });
+    }
+
     const { messages } = await req.json();
     const supabase = await createClient();
 
