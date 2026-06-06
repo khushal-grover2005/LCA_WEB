@@ -85,20 +85,39 @@ export async function POST(req: Request) {
     `;
 
     // 5. STREAM WITH ENHANCED RELIABILITY
-    const result = await streamText({
-      model: groq('llama-3.1-70b-versatile'), 
-      system: systemPrompt,
-      messages: messages.map((m: any) => ({
-        role: m.role,
-        content: m.content,
-      })),
-      temperature: 0.3,
-    });
+    console.log(`[${requestId}] About to call streamText with model: llama-3.1-70b-versatile`);
+    console.log(`[${requestId}] System prompt length: ${systemPrompt.length}`);
+    console.log(`[${requestId}] Messages count: ${messages.length}`);
 
+    let result;
+    try {
+      result = await streamText({
+        model: groq('llama-3.1-70b-versatile'), 
+        system: systemPrompt,
+        messages: messages.map((m: any) => ({
+          role: m.role,
+          content: m.content,
+        })),
+        temperature: 0.3,
+      });
+      console.log(`[${requestId}] streamText resolved successfully`);
+    } catch (streamError) {
+      console.error(`[${requestId}] streamText failed:`, streamError);
+      throw streamError;
+    }
+
+    console.log(`[${requestId}] Stream object type: ${typeof result}`);
     console.log(`[${requestId}] Stream initialized, returning response`);
 
     // 6. RETURN STREAM WITH PROPER HEADERS
-    const response = result.toTextStreamResponse();
+    let response;
+    try {
+      response = result.toTextStreamResponse();
+      console.log(`[${requestId}] toTextStreamResponse() called successfully`);
+    } catch (responseError) {
+      console.error(`[${requestId}] toTextStreamResponse() failed:`, responseError);
+      throw responseError;
+    }
     
     // Log completion
     response.headers.set('X-Request-ID', requestId);
