@@ -2,54 +2,42 @@ import { streamText } from 'ai';
 import { createClient } from '@/lib/supabase/server'; 
 import { createGroq } from '@ai-sdk/groq';
 
-// Initialize Groq ONCE at module level (reuse across requests)
+// Force initialization with the explicit environment variable
 const groq = createGroq({
   apiKey: process.env.GROQ_API_KEY || '', 
 });
 
-// 🔥 CRITICAL: 70B models need 60+ seconds. Vercel Pro supports up to 300 seconds
-export const maxDuration = 60;
+// Increased to 60s for high-latency model responses
+export const maxDuration = 60; 
 
 export async function POST(req: Request) {
-  const startTime = Date.now();
-  const requestId = Math.random().toString(36).slice(2, 9);
-  
   try {
-    // 🚨 API KEY VALIDATION
+    // 🚨 THE TRIPWIRE: This forces Vercel to log exactly what it sees
     if (!process.env.GROQ_API_KEY) {
-      console.error(`[${requestId}] FATAL: GROQ_API_KEY missing from environment`);
-      return new Response(JSON.stringify({ error: "Server Configuration Error" }), { status: 500 });
+      console.error("FATAL ERROR: GROQ_API_KEY is totally missing from this Vercel environment!");
+      return new Response(JSON.stringify({ error: "Server Configuration Error: Missing API Key in Vercel" }), { status: 500 });
     }
 
     const { messages } = await req.json();
-    
-    if (!messages || !Array.isArray(messages) || messages.length === 0) {
-      return new Response(JSON.stringify({ error: "Invalid request: messages array required" }), { status: 400 });
-    }
-
     const supabase = await createClient();
 
-    // 1. AUTHENTICATION
+    // 1. ABSOLUTE SECURITY CHECK (Mutual Exclusivity)
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
-      console.warn(`[${requestId}] Auth failed: ${authError?.message || 'No user'}`);
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
     }
 
-    console.log(`[${requestId}] Starting chat stream for user: ${user.id}`);
-
-    // 2. FETCH USER'S PREDICTIONS
-    const { data: predictions, error: fetchError } = await supabase
+    // 2. ISOLATED DATA FETCH
+    // This strictly pulls ONLY the data belonging to the logged-in user.
+    const { data: predictions, error: dbError } = await supabase
       .from('predictions')
       .select('id, metal, production_route, gwp_total, circularity_index, created_at')
       .eq('user_id', user.id) 
       .order('created_at', { ascending: false });
 
-    if (fetchError) {
-      console.error(`[${requestId}] DB fetch error:`, fetchError);
-    }
+    if (dbError) throw dbError;
 
-    // 3. BUILD CONTEXT
+    // 3. DATA SERIALIZATION FOR THE AI
     let contextData = "No predictions found in the database for this user.";
     if (predictions && predictions.length > 0) {
       contextData = predictions.map((p) => `
@@ -61,7 +49,7 @@ export async function POST(req: Request) {
       `).join('\n');
     }
 
-    // 4. SYSTEM PROMPT
+    // 4. THE MULTI-MODAL EXPERT PROMPT
     const systemPrompt = `
       You are the core intelligence of "MetalCycle", an elite Life Cycle Assessment (LCA) and Metallurgy AI.
       You have real-time access to the user's secure, isolated prediction database.
@@ -84,65 +72,18 @@ export async function POST(req: Request) {
       - Output your responses in clean Markdown. Use bullet points, bold text for key metrics, and maintain a highly academic, engineering-focused tone.
     `;
 
-    // 5. STREAM WITH ENHANCED RELIABILITY
-    console.log(`[${requestId}] About to call streamText with model: mixtral-8x7b-32768`);
-    console.log(`[${requestId}] System prompt length: ${systemPrompt.length}`);
-    console.log(`[${requestId}] Messages count: ${messages.length}`);
+    // 5. STREAM THE RESPONSE
+    const result = await streamText({
+      model: groq('llama-3.3-70b-versatile'), // ✅ Updated to the newest supported model
+      system: systemPrompt,
+      messages: messages,
+      temperature: 0.3, // Low temperature keeps it highly analytical and factual
+    });
 
-    let result;
-    try {
-      result = await streamText({
-        model: groq('mixtral-8x7b-32768'), 
-        system: systemPrompt,
-        messages: messages.map((m: any) => ({
-          role: m.role,
-          content: m.content,
-        })),
-        temperature: 0.3,
-      });
-      console.log(`[${requestId}] streamText resolved successfully`);
-    } catch (streamError) {
-      console.error(`[${requestId}] streamText failed:`, streamError);
-      throw streamError;
-    }
-
-    console.log(`[${requestId}] Stream object type: ${typeof result}`);
-    console.log(`[${requestId}] Stream initialized, returning response`);
-
-    // 6. RETURN STREAM WITH PROPER HEADERS
-    let response;
-    try {
-      response = result.toTextStreamResponse();
-      console.log(`[${requestId}] toTextStreamResponse() called successfully`);
-    } catch (responseError) {
-      console.error(`[${requestId}] toTextStreamResponse() failed:`, responseError);
-      throw responseError;
-    }
-    
-    // Log completion
-    response.headers.set('X-Request-ID', requestId);
-    response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
-    
-    // Track completion
-    const endTime = Date.now();
-    console.log(`[${requestId}] Stream response sent (setup time: ${endTime - startTime}ms)`);
-    
-    return response;
+    return result.toTextStreamResponse();
     
   } catch (error) {
-    const duration = Date.now() - startTime;
-    console.error(`[${requestId}] Error after ${duration}ms:`, error instanceof Error ? error.message : error);
-    
-    if (error instanceof Error && error.name === 'AbortError') {
-      return new Response(
-        JSON.stringify({ error: "Request timeout: Model response took too long" }), 
-        { status: 504 }
-      );
-    }
-
-    return new Response(
-      JSON.stringify({ error: "Failed to process chat request" }), 
-      { status: 500 }
-    );
+    console.error("Chat API Error:", error);
+    return new Response(JSON.stringify({ error: "Failed to process chat request" }), { status: 500 });
   }
 }
